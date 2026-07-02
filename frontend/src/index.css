@@ -1,14 +1,62 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html,
-body,
-#root {
-  height: 100%;
+/* ─── Design tokens (Modern SaaS: indigo + green + slate) ─────────── */
+:root {
+  --color-primary: #4f46e5; /* indigo-600 */
+  --color-primary-hover: #4338ca; /* indigo-700 */
+  --color-primary-soft: #eef2ff; /* indigo-50  */
+  --color-on-primary: #ffffff;
+
+  --color-accent: #16a34a; /* green-600 (success) */
+  --color-accent-soft: #dcfce7; /* green-100 */
+
+  --color-bg: #f8fafc; /* slate-50  */
+  --color-surface: #ffffff;
+  --color-foreground: #0f172a; /* slate-900 */
+  --color-muted: #64748b; /* slate-500 */
+  --color-border: #e2e8f0; /* slate-200 */
+
+  --color-destructive: #dc2626; /* red-600  */
+  --color-destructive-soft: #fee2e2; /* red-100  */
+
+  --radius: 0.75rem;
 }
 
-body {
-  margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+      "Segoe UI", Roboto, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Visible keyboard focus (a11y §1) */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Respect reduced motion (a11y §7) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

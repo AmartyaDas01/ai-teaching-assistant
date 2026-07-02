@@ -28,6 +28,9 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[settings.frontend_origin],
+    # Also accept any localhost port so Vite's dev-server port-hopping
+    # (5173 -> 5174 -> ...) doesn't break the frontend in local dev.
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

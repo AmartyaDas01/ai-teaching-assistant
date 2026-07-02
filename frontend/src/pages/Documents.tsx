@@ -1,3 +1,4 @@
+import { AlertCircle, FolderOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import DocumentCard from "../components/DocumentUpload/DocumentCard";
 import DropZone from "../components/DocumentUpload/DropZone";
@@ -44,23 +45,30 @@ export default function Documents() {
   return (
     <>
       <Navbar title="Documents" subtitle="Upload and manage course materials" />
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 space-y-6 overflow-y-auto p-6">
         <DropZone onFiles={handleFiles} disabled={uploading} />
 
         {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+          <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive-soft px-4 py-2.5 text-sm text-destructive">
+            <AlertCircle className="h-4 w-4 shrink-0" />
             {error}
           </div>
         )}
 
-        <div className="space-y-2">
-          {docs.length === 0 && !uploading && (
-            <p className="text-sm text-slate-400">No documents yet.</p>
-          )}
-          {docs.map((doc) => (
-            <DocumentCard key={doc.id} doc={doc} onDelete={handleDelete} />
-          ))}
-        </div>
+        {docs.length === 0 && !uploading ? (
+          <div className="flex flex-col items-center rounded-xl border border-dashed border-border py-12 text-center">
+            <FolderOpen className="mb-2 h-8 w-8 text-muted" />
+            <p className="text-sm text-muted">
+              No documents yet — upload your first lecture above.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {docs.map((doc) => (
+              <DocumentCard key={doc.id} doc={doc} onDelete={handleDelete} />
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

@@ -1,3 +1,4 @@
+import { Loader2, UploadCloud } from "lucide-react";
 import { useRef, useState } from "react";
 
 interface DropZoneProps {
@@ -28,11 +29,18 @@ export default function DropZone({ onFiles, disabled }: DropZoneProps) {
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}
       onClick={() => !disabled && inputRef.current?.click()}
-      className={`cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition ${
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) =>
+        (e.key === "Enter" || e.key === " ") &&
+        !disabled &&
+        inputRef.current?.click()
+      }
+      className={`flex cursor-pointer flex-col items-center rounded-xl border-2 border-dashed p-10 text-center transition-colors duration-150 ${
         dragging
-          ? "border-brand-500 bg-brand-50"
-          : "border-slate-300 bg-white hover:border-brand-400"
-      } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+          ? "border-primary bg-primary-soft"
+          : "border-border bg-surface hover:border-primary/60 hover:bg-slate-50"
+      } ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
     >
       <input
         ref={inputRef}
@@ -46,11 +54,17 @@ export default function DropZone({ onFiles, disabled }: DropZoneProps) {
           e.target.value = "";
         }}
       />
-      <div className="text-3xl mb-2">📤</div>
-      <p className="text-sm font-medium text-slate-700">
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-primary">
+        {disabled ? (
+          <Loader2 className="h-6 w-6 animate-spin" />
+        ) : (
+          <UploadCloud className="h-6 w-6" />
+        )}
+      </div>
+      <p className="text-sm font-semibold text-foreground">
         {disabled ? "Uploading…" : "Drop files here or click to browse"}
       </p>
-      <p className="text-xs text-slate-400 mt-1">PDF, DOCX, PPTX, or TXT</p>
+      <p className="mt-1 text-xs text-muted">PDF, DOCX, PPTX, or TXT</p>
     </div>
   );
 }
