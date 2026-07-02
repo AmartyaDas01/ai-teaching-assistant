@@ -1,4 +1,4 @@
-import { FileText, GraduationCap, MessageSquare } from "lucide-react";
+import { FileText, GraduationCap, MessageSquare, Sparkles } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const links = [
@@ -8,40 +8,64 @@ const links = [
 
 export default function Sidebar() {
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-surface">
-      <div className="flex items-center gap-3 border-b border-border px-5 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-fg">
+    <aside className="flex w-64 shrink-0 flex-col bg-slate-950 text-slate-300">
+      {/* Brand */}
+      <div className="flex items-center gap-3 px-5 py-6">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/30">
           <GraduationCap className="h-5 w-5" />
         </div>
-        <div>
-          <div className="text-sm font-bold leading-tight text-foreground">
-            AI Teaching
-          </div>
-          <div className="text-xs text-muted">Assistant</div>
+        <div className="leading-tight">
+          <div className="text-sm font-bold text-white">AI Teaching</div>
+          <div className="text-[11px] text-slate-500">Assistant</div>
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1 p-3">
-        {links.map(({ to, label, Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150 ${
-                isActive
-                  ? "bg-primary-soft text-primary"
-                  : "text-muted hover:bg-slate-50 hover:text-foreground"
-              }`
-            }
-          >
-            <Icon className="h-[18px] w-[18px]" />
-            {label}
-          </NavLink>
-        ))}
-      </nav>
+      {/* Nav */}
+      <div className="px-3">
+        <div className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+          Workspace
+        </div>
+        <nav className="space-y-1">
+          {links.map(({ to, label, Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150 ${
+                  isActive
+                    ? "bg-white/10 text-white"
+                    : "text-slate-400 hover:bg-white/5 hover:text-white"
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-indigo-400" />
+                  )}
+                  <Icon className="h-[18px] w-[18px]" />
+                  {label}
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
 
-      <div className="border-t border-border p-4 text-[11px] text-muted">
-        Phase 1 · Core RAG
+      {/* Footer card */}
+      <div className="mt-auto p-3">
+        <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
+          <div className="flex items-center gap-2 text-xs font-semibold text-white">
+            <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
+            Grounded RAG
+          </div>
+          <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
+            Answers cite your own course materials — no hallucinations.
+          </p>
+        </div>
+        <div className="px-1 pt-3 text-[11px] text-slate-600">
+          Phase 1 · Core RAG
+        </div>
       </div>
     </aside>
   );

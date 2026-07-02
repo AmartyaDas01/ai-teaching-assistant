@@ -44,8 +44,19 @@ export default function Documents() {
 
   return (
     <>
-      <Navbar title="Documents" subtitle="Upload and manage course materials" />
-      <div className="flex-1 space-y-6 overflow-y-auto p-6">
+      <Navbar
+        title="Documents"
+        subtitle="Upload and manage course materials"
+        action={
+          docs.length > 0 ? (
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+              {docs.length} {docs.length === 1 ? "document" : "documents"}
+            </span>
+          ) : undefined
+        }
+      />
+
+      <div className="scroll-slim flex-1 space-y-5 overflow-y-auto p-6">
         <DropZone onFiles={handleFiles} disabled={uploading} />
 
         {error && (
@@ -56,10 +67,13 @@ export default function Documents() {
         )}
 
         {docs.length === 0 && !uploading ? (
-          <div className="flex flex-col items-center rounded-xl border border-dashed border-border py-12 text-center">
-            <FolderOpen className="mb-2 h-8 w-8 text-muted" />
-            <p className="text-sm text-muted">
-              No documents yet — upload your first lecture above.
+          <div className="bg-dotted flex flex-col items-center rounded-xl border border-slate-200 py-16 text-center">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-card ring-1 ring-slate-200">
+              <FolderOpen className="h-6 w-6 text-slate-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-700">No documents yet</p>
+            <p className="mt-1 text-xs text-slate-500">
+              Upload your first lecture above to start chatting with it.
             </p>
           </div>
         ) : (

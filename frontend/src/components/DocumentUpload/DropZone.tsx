@@ -36,10 +36,10 @@ export default function DropZone({ onFiles, disabled }: DropZoneProps) {
         !disabled &&
         inputRef.current?.click()
       }
-      className={`flex cursor-pointer flex-col items-center rounded-xl border-2 border-dashed p-10 text-center transition-colors duration-150 ${
+      className={`group flex cursor-pointer items-center gap-4 rounded-xl border border-dashed p-5 transition-all duration-150 ${
         dragging
-          ? "border-primary bg-primary-soft"
-          : "border-border bg-surface hover:border-primary/60 hover:bg-slate-50"
+          ? "border-primary bg-primary-soft/60 ring-4 ring-primary/10"
+          : "border-slate-300 bg-white hover:border-primary/50 hover:bg-slate-50"
       } ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
     >
       <input
@@ -54,17 +54,27 @@ export default function DropZone({ onFiles, disabled }: DropZoneProps) {
           e.target.value = "";
         }}
       />
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-primary">
+      <div
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors ${
+          dragging
+            ? "bg-primary text-white"
+            : "bg-primary-soft text-primary group-hover:bg-primary group-hover:text-white"
+        }`}
+      >
         {disabled ? (
-          <Loader2 className="h-6 w-6 animate-spin" />
+          <Loader2 className="h-5 w-5 animate-spin" />
         ) : (
-          <UploadCloud className="h-6 w-6" />
+          <UploadCloud className="h-5 w-5" />
         )}
       </div>
-      <p className="text-sm font-semibold text-foreground">
-        {disabled ? "Uploading…" : "Drop files here or click to browse"}
-      </p>
-      <p className="mt-1 text-xs text-muted">PDF, DOCX, PPTX, or TXT</p>
+      <div className="min-w-0">
+        <p className="text-sm font-semibold text-slate-900">
+          {disabled ? "Uploading…" : "Upload course materials"}
+        </p>
+        <p className="mt-0.5 text-xs text-slate-500">
+          Drag &amp; drop or click — PDF, DOCX, PPTX, TXT
+        </p>
+      </div>
     </div>
   );
 }

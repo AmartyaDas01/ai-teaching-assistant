@@ -59,4 +59,37 @@
       scroll-behavior: auto !important;
     }
   }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-primary) 22%, transparent);
+    color: var(--color-foreground);
+  }
+}
+
+@layer utilities {
+  /* Thin, unobtrusive scrollbars for content areas */
+  .scroll-slim {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+  .scroll-slim::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  .scroll-slim::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+    background-clip: content-box;
+  }
+
+  /* Subtle dotted texture for large empty surfaces */
+  .bg-dotted {
+    background-image: radial-gradient(rgb(148 163 184 / 0.25) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
 }
