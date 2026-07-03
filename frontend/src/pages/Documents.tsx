@@ -1,19 +1,30 @@
 import { AlertCircle, FolderOpen } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DocumentCard from "../components/DocumentUpload/DocumentCard";
 import DropZone from "../components/DocumentUpload/DropZone";
 import Navbar from "../components/layout/Navbar";
+import { UploadCard } from "@/components/ui/upload-ui";
 import { deleteDocument, listDocuments, uploadDocument } from "../services/api";
 import type { Document } from "../types";
 
+interface UploadItem {
+  id: string;
+  file: File;
+  status: "uploading" | "success" | "error";
+  progress: number;
+  message?: string;
+}
+
 export default function Documents() {
   const [docs, setDocs] = useState<Document[]>([]);
-  const [uploading, setUploading] = useState(false);
+  const [uploads, setUploads] = useState<UploadItem[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const controllers = useRef<Map<string, AbortController>>(new Map());
 
   async function refresh() {
     try {
       setDocs(await listDocuments());
+      setError(null);
     } catch {
       setError("Could not reach the backend. Is it running on :8000?");
     }
@@ -23,18 +34,56 @@ export default function Documents() {
     refresh();
   }, []);
 
-  async function handleFiles(files: File[]) {
-    setUploading(true);
-    setError(null);
-    for (const file of files) {
-      try {
-        await uploadDocument(file);
-      } catch (e: any) {
-        setError(e?.response?.data?.detail ?? `Failed to upload ${file.name}`);
+  function patch(id: string, changes: Partial<UploadItem>) {
+    setUploads((prev) =>
+      prev.map((u) => (u.id === id ? { ...u, ...changes } : u))
+    );
+  }
+
+  function remove(id: string) {
+    controllers.current.delete(id);
+    setUploads((prev) => prev.filter((u) => u.id !== id));
+  }
+
+  async function startUpload(item: UploadItem) {
+    const controller = new AbortController();
+    controllers.current.set(item.id, controller);
+    patch(item.id, { status: "uploading", progress: 0, message: undefined });
+    try {
+      await uploadDocument(item.file, {
+        signal: controller.signal,
+        onProgress: (p) => patch(item.id, { progress: p }),
+      });
+      patch(item.id, { status: "success", progress: 100 });
+      controllers.current.delete(item.id);
+      refresh();
+    } catch (e: any) {
+      if (e?.code === "ERR_CANCELED" || e?.name === "CanceledError") {
+        remove(item.id); // user cancelled — drop the card silently
+        return;
       }
+      patch(item.id, {
+        status: "error",
+        message: e?.response?.data?.detail ?? "Upload failed. Please try again.",
+      });
+      controllers.current.delete(item.id);
     }
-    setUploading(false);
-    refresh();
+  }
+
+  function handleFiles(files: File[]) {
+    const items: UploadItem[] = files.map((file) => ({
+      id: `${Date.now()}-${file.name}-${Math.random().toString(36).slice(2, 7)}`,
+      file,
+      status: "uploading",
+      progress: 0,
+    }));
+    setUploads((prev) => [...items, ...prev]);
+    items.forEach(startUpload);
+  }
+
+  function cancel(id: string) {
+    controllers.current.get(id)?.abort();
+    remove(id);
   }
 
   async function handleDelete(id: number) {
@@ -57,7 +106,55 @@ export default function Documents() {
       />
 
       <div className="scroll-slim flex-1 space-y-5 overflow-y-auto p-6">
-        <DropZone onFiles={handleFiles} disabled={uploading} />
+        <DropZone onFiles={handleFiles} />
+
+        {/* Live upload cards */}
+        {uploads.length > 0 && (
+          <div className="space-y-3">
+            {uploads.map((u) => {
+              if (u.status === "uploading") {
+                return (
+                  <UploadCard
+                    key={u.id}
+                    status="uploading"
+                    progress={u.progress}
+                    title={u.progress >= 100 ? "Processing…" : "Uploading…"}
+                    description={u.file.name}
+                    primaryButtonText="Cancel"
+                    onPrimaryButtonClick={() => cancel(u.id)}
+                    onClose={() => cancel(u.id)}
+                  />
+                );
+              }
+              if (u.status === "success") {
+                return (
+                  <UploadCard
+                    key={u.id}
+                    status="success"
+                    title="Uploaded & indexed"
+                    description={`${u.file.name} is ready to chat with.`}
+                    primaryButtonText="Done"
+                    onPrimaryButtonClick={() => remove(u.id)}
+                    onClose={() => remove(u.id)}
+                  />
+                );
+              }
+              return (
+                <UploadCard
+                  key={u.id}
+                  status="error"
+                  title="Upload failed"
+                  description={u.message ?? u.file.name}
+                  primaryButtonText="Retry"
+                  onPrimaryButtonClick={() => startUpload(u)}
+                  secondaryButtonText="Dismiss"
+                  onSecondaryButtonClick={() => remove(u.id)}
+                  onClose={() => remove(u.id)}
+                />
+              );
+            })}
+          </div>
+        )}
 
         {error && (
           <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive-soft px-4 py-2.5 text-sm text-destructive">
@@ -66,7 +163,7 @@ export default function Documents() {
           </div>
         )}
 
-        {docs.length === 0 && !uploading ? (
+        {docs.length === 0 && uploads.length === 0 ? (
           <div className="bg-dotted flex flex-col items-center rounded-xl border border-slate-200 py-16 text-center">
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-card ring-1 ring-slate-200">
               <FolderOpen className="h-6 w-6 text-slate-400" />

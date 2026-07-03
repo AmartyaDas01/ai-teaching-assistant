@@ -19,15 +19,27 @@ export async function listDocuments(courseId?: number): Promise<Document[]> {
   return data;
 }
 
+export interface UploadOptions {
+  courseId?: number;
+  onProgress?: (percent: number) => void;
+  signal?: AbortSignal;
+}
+
 export async function uploadDocument(
   file: File,
-  courseId?: number
+  opts: UploadOptions = {}
 ): Promise<Document> {
   const form = new FormData();
   form.append("file", file);
   const { data } = await api.post<Document>("/documents/upload", form, {
-    params: courseId ? { course_id: courseId } : undefined,
+    params: opts.courseId ? { course_id: opts.courseId } : undefined,
     headers: { "Content-Type": "multipart/form-data" },
+    signal: opts.signal,
+    onUploadProgress: (e) => {
+      if (opts.onProgress && e.total) {
+        opts.onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    },
   });
   return data;
 }
