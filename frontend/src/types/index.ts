@@ -1,3 +1,31 @@
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
+export interface AuthToken {
+  access_token: string;
+  token_type: string;
+  user: User;
+}
+
+export interface Course {
+  id: number;
+  name: string;
+  semester: string | null;
+  created_at: string;
+}
+
+export interface LLMSettings {
+  provider: "openai" | "ollama";
+  override: "auto" | "openai" | "ollama";
+  openai_available: boolean;
+  ollama_model: string;
+  openai_model: string;
+}
+
 export interface Document {
   id: number;
   course_id: number;

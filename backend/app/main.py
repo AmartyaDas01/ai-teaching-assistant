@@ -7,7 +7,15 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import analytics, chat, documents, quiz
+from app.api.routes import (
+    analytics,
+    auth,
+    chat,
+    courses,
+    documents,
+    quiz,
+    settings as settings_routes,
+)
 from app.config import settings
 from app.db import init_db
 
@@ -36,10 +44,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
+app.include_router(courses.router)
 app.include_router(documents.router)
 app.include_router(chat.router)
 app.include_router(quiz.router)
 app.include_router(analytics.router)
+app.include_router(settings_routes.router)
 
 
 @app.get("/health", tags=["health"])

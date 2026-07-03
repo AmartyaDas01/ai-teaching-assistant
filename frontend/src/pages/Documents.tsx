@@ -5,6 +5,7 @@ import DropZone from "../components/DocumentUpload/DropZone";
 import Navbar from "../components/layout/Navbar";
 import { UploadCard } from "@/components/ui/upload-ui";
 import { deleteDocument, listDocuments, uploadDocument } from "../services/api";
+import { useAppStore } from "../store/useAppStore";
 import type { Document } from "../types";
 
 interface UploadItem {
@@ -20,10 +21,11 @@ export default function Documents() {
   const [uploads, setUploads] = useState<UploadItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const controllers = useRef<Map<string, AbortController>>(new Map());
+  const activeCourseId = useAppStore((s) => s.activeCourseId);
 
   async function refresh() {
     try {
-      setDocs(await listDocuments());
+      setDocs(await listDocuments(activeCourseId));
       setError(null);
     } catch {
       setError("Could not reach the backend. Is it running on :8000?");
@@ -32,7 +34,8 @@ export default function Documents() {
 
   useEffect(() => {
     refresh();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCourseId]);
 
   function patch(id: string, changes: Partial<UploadItem>) {
     setUploads((prev) =>
@@ -51,6 +54,7 @@ export default function Documents() {
     patch(item.id, { status: "uploading", progress: 0, message: undefined });
     try {
       await uploadDocument(item.file, {
+        courseId: activeCourseId,
         signal: controller.signal,
         onProgress: (p) => patch(item.id, { progress: p }),
       });

@@ -11,6 +11,7 @@ import re
 
 from sqlalchemy.orm import Session
 
+from app.models.course import Course
 from app.models.document import Document
 from app.models.quiz import Question, Quiz, QuizAttempt
 from app.schemas import (
@@ -161,9 +162,12 @@ def _validate_questions(data: dict, allowed_levels: list[str]) -> list[dict]:
     return valid
 
 
-def generate_quiz(db: Session, req: QuizGenerateRequest) -> Quiz:
+def generate_quiz(db: Session, req: QuizGenerateRequest, user_id: int) -> Quiz:
     doc = db.get(Document, req.document_id)
     if doc is None:
+        raise QuizGenerationError("Document not found.")
+    course = db.get(Course, doc.course_id)
+    if course is None or course.user_id != user_id:
         raise QuizGenerationError("Document not found.")
     if doc.status != "ready" or not doc.chroma_collection_id:
         raise QuizGenerationError("Document is not ready — wait for processing to finish.")

@@ -1,14 +1,29 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Sidebar from "./components/layout/Sidebar";
 import Chat from "./pages/Chat";
 import Documents from "./pages/Documents";
+import Login from "./pages/Login";
 import Quiz from "./pages/Quiz";
+import Settings from "./pages/Settings";
+import { useAppStore } from "./store/useAppStore";
 
 // Code-split the analytics page so Recharts loads only when needed.
 const Analytics = lazy(() => import("./pages/Analytics"));
 
 export default function App() {
+  const token = useAppStore((s) => s.token);
+  const logout = useAppStore((s) => s.logout);
+
+  // React to 401s dispatched from the axios interceptor.
+  useEffect(() => {
+    const handler = () => logout();
+    window.addEventListener("auth:unauthorized", handler);
+    return () => window.removeEventListener("auth:unauthorized", handler);
+  }, [logout]);
+
+  if (!token) return <Login />;
+
   return (
     <div className="flex h-full bg-slate-950 text-slate-900">
       <Sidebar />
@@ -26,6 +41,8 @@ export default function App() {
             <Route path="/chat" element={<Chat />} />
             <Route path="/quiz" element={<Quiz />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<Navigate to="/documents" replace />} />
           </Routes>
         </Suspense>
       </div>

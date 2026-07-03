@@ -2,7 +2,51 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+
+# ─── Auth ────────────────────────────────────────────────────────
+
+class UserCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=255)
+    email: EmailStr
+    password: str = Field(min_length=6, max_length=128)
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    email: EmailStr
+    role: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserOut
+
+
+# ─── Courses ─────────────────────────────────────────────────────
+
+class CourseCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=255)
+    semester: str | None = None
+
+
+class CourseOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    semester: str | None
+    created_at: datetime
 
 BloomLevel = Literal["L1", "L2", "L3", "L4", "L5", "L6"]
 Difficulty = Literal["easy", "medium", "hard"]
@@ -136,6 +180,18 @@ class HeatmapCell(BaseModel):
     student: str
     quiz_id: int
     score: float  # avg score for that student on that quiz
+
+
+class LLMSettings(BaseModel):
+    provider: str  # active: "openai" | "ollama"
+    override: str  # "auto" | "openai" | "ollama"
+    openai_available: bool
+    ollama_model: str
+    openai_model: str
+
+
+class LLMSettingsUpdate(BaseModel):
+    override: Literal["auto", "openai", "ollama"]
 
 
 class AnalyticsOverview(BaseModel):

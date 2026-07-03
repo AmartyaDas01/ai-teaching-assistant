@@ -1,0 +1,40 @@
+# Render Blueprint — backend API + managed Postgres.
+# In production the LLM is OpenAI (Ollama can't run on Render), so set OPENAI_API_KEY.
+# Embeddings stay local (sentence-transformers) inside the container.
+
+services:
+  - type: web
+    name: ai-ta-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter # torch/sentence-transformers need more than the free tier
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ai-ta-db
+          property: connectionString
+      - key: OPENAI_API_KEY
+        sync: false # set this in the Render dashboard
+      - key: OPENAI_MODEL
+        value: gpt-4o
+      - key: LLM_PROVIDER
+        value: openai
+      - key: EMBEDDING_PROVIDER
+        value: local
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: CHROMA_PERSIST_DIR
+        value: /data/chroma
+      - key: UPLOAD_DIR
+        value: /data/uploads
+      - key: FRONTEND_ORIGIN
+        value: https://REPLACE-with-your-vercel-domain.vercel.app
+
+databases:
+  - name: ai-ta-db
+    plan: starter

@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     # Vector store
     chroma_persist_dir: str = "./chroma_data"
 
+    # Auth
+    jwt_secret_key: str = "dev-secret-change-me"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60 * 24 * 7  # 7 days
+
     # Storage
     storage_provider: str = "local"
     upload_dir: str = "./uploads"

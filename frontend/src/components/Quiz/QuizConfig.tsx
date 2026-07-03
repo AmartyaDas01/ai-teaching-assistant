@@ -1,6 +1,7 @@
 import { Loader2, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { listDocuments } from "../../services/api";
+import { useAppStore } from "../../store/useAppStore";
 import type {
   BloomLevel,
   Difficulty,
@@ -23,15 +24,15 @@ export default function QuizConfig({ onGenerate, generating }: QuizConfigProps) 
   const [numQuestions, setNumQuestions] = useState(5);
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [levels, setLevels] = useState<BloomLevel[]>(["L1", "L2", "L3"]);
+  const activeCourseId = useAppStore((s) => s.activeCourseId);
 
   useEffect(() => {
-    listDocuments().then((d) => {
+    listDocuments(activeCourseId).then((d) => {
       const ready = d.filter((x) => x.status === "ready");
       setDocs(ready);
-      if (ready.length && documentId === null) setDocumentId(ready[0].id);
+      setDocumentId(ready.length ? ready[0].id : null);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [activeCourseId]);
 
   function toggleLevel(l: BloomLevel) {
     setLevels((prev) =>

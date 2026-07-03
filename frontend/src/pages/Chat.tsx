@@ -2,17 +2,19 @@ import { useState } from "react";
 import ChatWindow from "../components/Chat/ChatWindow";
 import Navbar from "../components/layout/Navbar";
 import { queryChat } from "../services/api";
+import { useAppStore } from "../store/useAppStore";
 import type { ChatMessage } from "../types";
 
 export default function Chat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const activeCourseId = useAppStore((s) => s.activeCourseId);
 
   async function handleSend(question: string) {
     setMessages((prev) => [...prev, { role: "user", content: question }]);
     setLoading(true);
     try {
-      const res = await queryChat(question);
+      const res = await queryChat(question, activeCourseId);
       setMessages((prev) => [
         ...prev,
         {

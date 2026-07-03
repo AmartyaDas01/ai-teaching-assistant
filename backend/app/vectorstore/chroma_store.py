@@ -129,3 +129,11 @@ def delete_document(collection_name: str, doc_id: int) -> None:
     except Exception:
         # Collection may not exist (e.g. ingestion failed before any add) — nothing to do.
         pass
+
+
+def delete_collection(collection_name: str) -> None:
+    """Drop an entire course collection (used when a course is deleted)."""
+    try:
+        _get_client().delete_collection(name=collection_name)
+    except Exception:
+        pass

@@ -3,19 +3,35 @@ import {
   FileText,
   GraduationCap,
   ListChecks,
+  LogOut,
   MessageSquare,
-  Sparkles,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useAppStore } from "../../store/useAppStore";
+import CourseSelector from "./CourseSelector";
 
 const links = [
   { to: "/documents", label: "Documents", Icon: FileText },
   { to: "/chat", label: "Chat", Icon: MessageSquare },
   { to: "/quiz", label: "Quiz Generator", Icon: ListChecks },
   { to: "/analytics", label: "Analytics", Icon: BarChart3 },
+  { to: "/settings", label: "Settings", Icon: SettingsIcon },
 ];
 
 export default function Sidebar() {
+  const user = useAppStore((s) => s.user);
+  const logout = useAppStore((s) => s.logout);
+
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((w) => w[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "?";
+
   return (
     <aside className="flex w-64 shrink-0 flex-col bg-slate-950 text-slate-300">
       {/* Brand */}
@@ -29,8 +45,10 @@ export default function Sidebar() {
         </div>
       </div>
 
+      <CourseSelector />
+
       {/* Nav */}
-      <div className="px-3">
+      <div className="px-3 pt-2">
         <div className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-600">
           Workspace
         </div>
@@ -61,19 +79,25 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* Footer card */}
-      <div className="mt-auto p-3">
-        <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
-          <div className="flex items-center gap-2 text-xs font-semibold text-white">
-            <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
-            Grounded RAG
+      {/* User + logout */}
+      <div className="mt-auto border-t border-white/10 p-3">
+        <div className="flex items-center gap-3 px-1">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white">
+            {initials}
           </div>
-          <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
-            Answers cite your own course materials — no hallucinations.
-          </p>
-        </div>
-        <div className="px-1 pt-3 text-[11px] text-slate-600">
-          Phase 1 · Core RAG
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-xs font-semibold text-white">
+              {user?.name}
+            </div>
+            <div className="truncate text-[11px] text-slate-500">{user?.email}</div>
+          </div>
+          <button
+            onClick={logout}
+            className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </aside>

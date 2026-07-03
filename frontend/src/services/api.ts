@@ -2,16 +2,106 @@ import axios from "axios";
 import type {
   AnalyticsOverview,
   AttemptResult,
+  AuthToken,
   ChatResponse,
+  Course,
   Document,
+  LLMSettings,
   Quiz,
   QuizGenerateRequest,
   QuizSummary,
+  User,
 } from "../types";
 
 const baseURL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 export const api = axios.create({ baseURL });
+
+// ─── Auth token wiring ───────────────────────────────────────────
+let authToken: string | null = localStorage.getItem("ata_token");
+
+export function setAuthToken(token: string | null): void {
+  authToken = token;
+  if (token) localStorage.setItem("ata_token", token);
+  else localStorage.removeItem("ata_token");
+}
+
+api.interceptors.request.use((config) => {
+  if (authToken) config.headers.Authorization = `Bearer ${authToken}`;
+  return config;
+});
+
+api.interceptors.response.use(
+  (r) => r,
+  (error) => {
+    // On expired/invalid session, drop the token and let the app show login.
+    if (error?.response?.status === 401) {
+      setAuthToken(null);
+      window.dispatchEvent(new Event("auth:unauthorized"));
+    }
+    return Promise.reject(error);
+  }
+);
+
+// ─── Auth ────────────────────────────────────────────────────────
+
+export async function register(
+  name: string,
+  email: string,
+  password: string
+): Promise<AuthToken> {
+  const { data } = await api.post<AuthToken>("/auth/register", {
+    name,
+    email,
+    password,
+  });
+  return data;
+}
+
+export async function login(email: string, password: string): Promise<AuthToken> {
+  const { data } = await api.post<AuthToken>("/auth/login", { email, password });
+  return data;
+}
+
+export async function fetchMe(): Promise<User> {
+  const { data } = await api.get<User>("/auth/me");
+  return data;
+}
+
+// ─── Courses ─────────────────────────────────────────────────────
+
+export async function listCourses(): Promise<Course[]> {
+  const { data } = await api.get<Course[]>("/courses");
+  return data;
+}
+
+export async function createCourse(
+  name: string,
+  semester?: string
+): Promise<Course> {
+  const { data } = await api.post<Course>("/courses", { name, semester });
+  return data;
+}
+
+export async function deleteCourse(id: number): Promise<void> {
+  await api.delete(`/courses/${id}`);
+}
+
+// ─── Settings ────────────────────────────────────────────────────
+
+export async function getLLMSettings(): Promise<LLMSettings> {
+  const { data } = await api.get<LLMSettings>("/settings/llm");
+  return data;
+}
+
+export async function setLLMSettings(
+  override: "auto" | "openai" | "ollama"
+): Promise<LLMSettings> {
+  const { data } = await api.put<LLMSettings>("/settings/llm", { override });
+  return data;
+}
+
+// ─── Documents ───────────────────────────────────────────────────
 
 export async function listDocuments(courseId?: number): Promise<Document[]> {
   const { data } = await api.get<Document[]>("/documents", {

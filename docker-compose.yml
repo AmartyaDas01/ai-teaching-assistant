@@ -1,0 +1,61 @@
+# One-command local stack: Postgres + FastAPI backend + built frontend.
+#
+# The LLM runs on the HOST (Ollama at host.docker.internal:11434) or via OpenAI.
+# Set OPENAI_API_KEY in your shell/.env to use GPT-4o instead of local Ollama.
+#
+#   docker compose up --build
+#   frontend -> http://localhost:8080   backend -> http://localhost:8000
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ata
+      POSTGRES_PASSWORD: ata
+      POSTGRES_DB: ai_teaching_assistant
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ata"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgresql://ata:ata@db:5432/ai_teaching_assistant
+      # LLM: uses OpenAI if a key is provided, otherwise host Ollama.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+      OLLAMA_NUM_GPU: ${OLLAMA_NUM_GPU:-}
+      EMBEDDING_PROVIDER: local
+      CHROMA_PERSIST_DIR: /data/chroma
+      UPLOAD_DIR: /data/uploads
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me-in-production}
+      FRONTEND_ORIGIN: http://localhost:8080
+    volumes:
+      - appdata:/data
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8000
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  appdata:

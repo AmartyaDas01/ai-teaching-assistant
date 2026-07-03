@@ -9,6 +9,7 @@ from collections import defaultdict
 
 from sqlalchemy.orm import Session
 
+from app.models.course import Course
 from app.models.document import Document
 from app.models.quiz import Question, Quiz, QuizAttempt
 from app.schemas import (
@@ -31,11 +32,25 @@ BLOOM_NAMES = {
 BLOOM_ORDER = ["L1", "L2", "L3", "L4", "L5", "L6"]
 
 
-def compute_overview(db: Session) -> AnalyticsOverview:
-    num_documents = db.query(Document).count()
-    quizzes = db.query(Quiz).all()
-    questions = db.query(Question).all()
-    attempts = db.query(QuizAttempt).order_by(QuizAttempt.attempted_at).all()
+def compute_overview(db: Session, user_id: int) -> AnalyticsOverview:
+    num_documents = (
+        db.query(Document).join(Course).filter(Course.user_id == user_id).count()
+    )
+    quizzes = db.query(Quiz).join(Course).filter(Course.user_id == user_id).all()
+    quiz_ids = [q.id for q in quizzes]
+    questions = (
+        db.query(Question).filter(Question.quiz_id.in_(quiz_ids)).all()
+        if quiz_ids
+        else []
+    )
+    attempts = (
+        db.query(QuizAttempt)
+        .filter(QuizAttempt.quiz_id.in_(quiz_ids))
+        .order_by(QuizAttempt.attempted_at)
+        .all()
+        if quiz_ids
+        else []
+    )
 
     quiz_title = {q.id: q.title for q in quizzes}
     q_by_id = {q.id: q for q in questions}

@@ -1,10 +1,13 @@
-"""Quiz endpoints — generate, list, take, submit, export."""
+"""Quiz endpoints — generate, list, take, submit, export (scoped to the user)."""
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.deps import get_current_user
+from app.models.course import Course
 from app.models.quiz import Quiz
+from app.models.user import User
 from app.schemas import (
     AttemptResult,
     QuestionPublic,
@@ -16,6 +19,18 @@ from app.schemas import (
 from app.services import quiz_service, rag_service
 
 router = APIRouter(prefix="/quiz", tags=["quiz"])
+
+
+def _owned_quiz(quiz_id: int, db: Session, user: User) -> Quiz:
+    quiz = (
+        db.query(Quiz)
+        .join(Course)
+        .filter(Quiz.id == quiz_id, Course.user_id == user.id)
+        .first()
+    )
+    if quiz is None:
+        raise HTTPException(status_code=404, detail="Quiz not found")
+    return quiz
 
 
 def _to_quiz_out(quiz: Quiz) -> QuizOut:
@@ -38,9 +53,13 @@ def _to_quiz_out(quiz: Quiz) -> QuizOut:
 
 
 @router.post("/generate", response_model=QuizOut, status_code=201)
-def generate_quiz(req: QuizGenerateRequest, db: Session = Depends(get_db)):
+def generate_quiz(
+    req: QuizGenerateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     try:
-        quiz = quiz_service.generate_quiz(db, req)
+        quiz = quiz_service.generate_quiz(db, req, current_user.id)
     except rag_service.LLMUnavailableError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except quiz_service.QuizGenerationError as exc:
@@ -49,8 +68,17 @@ def generate_quiz(req: QuizGenerateRequest, db: Session = Depends(get_db)):
 
 
 @router.get("", response_model=list[QuizSummary])
-def list_quizzes(db: Session = Depends(get_db)):
-    quizzes = db.query(Quiz).order_by(Quiz.created_at.desc()).all()
+def list_quizzes(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    quizzes = (
+        db.query(Quiz)
+        .join(Course)
+        .filter(Course.user_id == current_user.id)
+        .order_by(Quiz.created_at.desc())
+        .all()
+    )
     return [
         QuizSummary(
             id=q.id,
@@ -65,27 +93,33 @@ def list_quizzes(db: Session = Depends(get_db)):
 
 
 @router.get("/{quiz_id}", response_model=QuizOut)
-def get_quiz(quiz_id: int, db: Session = Depends(get_db)):
-    quiz = db.get(Quiz, quiz_id)
-    if quiz is None:
-        raise HTTPException(status_code=404, detail="Quiz not found")
-    return _to_quiz_out(quiz)
+def get_quiz(
+    quiz_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return _to_quiz_out(_owned_quiz(quiz_id, db, current_user))
 
 
 @router.post("/{quiz_id}/submit", response_model=AttemptResult)
-def submit_quiz(quiz_id: int, submit: SubmitRequest, db: Session = Depends(get_db)):
-    quiz = db.get(Quiz, quiz_id)
-    if quiz is None:
-        raise HTTPException(status_code=404, detail="Quiz not found")
+def submit_quiz(
+    quiz_id: int,
+    submit: SubmitRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    quiz = _owned_quiz(quiz_id, db, current_user)
     return quiz_service.score_attempt(db, quiz, submit)
 
 
 @router.get("/{quiz_id}/export")
-def export_quiz(quiz_id: int, db: Session = Depends(get_db)):
+def export_quiz(
+    quiz_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Full quiz with answer key as downloadable JSON."""
-    quiz = db.get(Quiz, quiz_id)
-    if quiz is None:
-        raise HTTPException(status_code=404, detail="Quiz not found")
+    quiz = _owned_quiz(quiz_id, db, current_user)
     payload = {
         "title": quiz.title,
         "config": quiz.config_json,
@@ -108,9 +142,11 @@ def export_quiz(quiz_id: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/{quiz_id}", status_code=204)
-def delete_quiz(quiz_id: int, db: Session = Depends(get_db)):
-    quiz = db.get(Quiz, quiz_id)
-    if quiz is None:
-        raise HTTPException(status_code=404, detail="Quiz not found")
+def delete_quiz(
+    quiz_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    quiz = _owned_quiz(quiz_id, db, current_user)
     db.delete(quiz)
     db.commit()

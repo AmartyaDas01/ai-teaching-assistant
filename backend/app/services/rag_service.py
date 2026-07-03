@@ -22,14 +22,33 @@ class LLMUnavailableError(RuntimeError):
     """Raised when no LLM backend can be reached (no OpenAI key and Ollama is down)."""
 
 
-def get_llm(json_mode: bool = False, temperature: float = 0.2):
-    """Return a LangChain chat model based on configuration.
+# Runtime override set via the settings API ("auto" | "openai" | "ollama").
+# Process-global (resets on restart); fine for a single-professor tool.
+_provider_override: str | None = None
 
-    OpenAI when a key is present (and provider isn't forced to ollama); else Ollama.
+
+def set_provider_override(provider: str | None) -> None:
+    global _provider_override
+    _provider_override = provider if provider in ("openai", "ollama") else None
+
+
+def active_provider() -> str:
+    """Resolve the effective provider, honoring the override and key availability."""
+    if _provider_override == "ollama":
+        return "ollama"
+    if _provider_override == "openai":
+        return "openai" if settings.openai_api_key.strip() else "ollama"
+    # auto
+    return "openai" if settings.use_openai else "ollama"
+
+
+def get_llm(json_mode: bool = False, temperature: float = 0.2):
+    """Return a LangChain chat model based on the active provider.
+
     When json_mode is True, the model is constrained to emit valid JSON (used for
     structured quiz generation).
     """
-    if settings.use_openai:
+    if active_provider() == "openai":
         from langchain_openai import ChatOpenAI
 
         model_kwargs = {}
@@ -105,7 +124,7 @@ def answer_query(question: str, collection_name: str) -> ChatResponse:
         f"Question: {question}\n\n"
         "Answer using only the excerpts above."
     )
-    provider = "openai" if settings.use_openai else "ollama"
+    provider = active_provider()
 
     try:
         llm = get_llm()
