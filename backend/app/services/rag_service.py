@@ -22,18 +22,24 @@ class LLMUnavailableError(RuntimeError):
     """Raised when no LLM backend can be reached (no OpenAI key and Ollama is down)."""
 
 
-def get_llm():
+def get_llm(json_mode: bool = False, temperature: float = 0.2):
     """Return a LangChain chat model based on configuration.
 
     OpenAI when a key is present (and provider isn't forced to ollama); else Ollama.
+    When json_mode is True, the model is constrained to emit valid JSON (used for
+    structured quiz generation).
     """
     if settings.use_openai:
         from langchain_openai import ChatOpenAI
 
+        model_kwargs = {}
+        if json_mode:
+            model_kwargs["response_format"] = {"type": "json_object"}
         return ChatOpenAI(
             model=settings.openai_model,
             api_key=settings.openai_api_key,
-            temperature=0.2,
+            temperature=temperature,
+            model_kwargs=model_kwargs,
         )
 
     from langchain_ollama import ChatOllama
@@ -41,11 +47,13 @@ def get_llm():
     kwargs = {}
     if settings.ollama_num_gpu is not None:
         kwargs["num_gpu"] = settings.ollama_num_gpu
+    if json_mode:
+        kwargs["format"] = "json"
 
     return ChatOllama(
         model=settings.ollama_model,
         base_url=settings.ollama_base_url,
-        temperature=0.2,
+        temperature=temperature,
         **kwargs,
     )
 

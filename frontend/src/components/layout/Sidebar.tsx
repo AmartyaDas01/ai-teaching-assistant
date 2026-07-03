@@ -1,9 +1,16 @@
-import { FileText, GraduationCap, MessageSquare, Sparkles } from "lucide-react";
+import {
+  FileText,
+  GraduationCap,
+  ListChecks,
+  MessageSquare,
+  Sparkles,
+} from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const links = [
   { to: "/documents", label: "Documents", Icon: FileText },
   { to: "/chat", label: "Chat", Icon: MessageSquare },
+  { to: "/quiz", label: "Quiz Generator", Icon: ListChecks },
 ];
 
 export default function Sidebar() {

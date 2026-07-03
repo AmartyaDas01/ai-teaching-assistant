@@ -98,6 +98,29 @@ def similarity_search(collection_name: str, query: str, k: int = 5) -> list[dict
     return results
 
 
+def get_document_chunks(
+    collection_name: str, doc_id: int, limit: int = 20
+) -> list[dict]:
+    """Return up to `limit` chunks for a single document, ordered by chunk_index.
+
+    Used for quiz generation, where we want broad coverage of one document rather
+    than similarity to a query.
+    """
+    try:
+        coll = _collection(collection_name)
+    except Exception:
+        return []
+    res = coll.get(where={"doc_id": doc_id})
+    docs = res.get("documents", []) or []
+    metas = res.get("metadatas", []) or []
+    items = [
+        {"text": t, "metadata": m}
+        for t, m in zip(docs, metas)
+    ]
+    items.sort(key=lambda x: x["metadata"].get("chunk_index", 0))
+    return items[:limit]
+
+
 def delete_document(collection_name: str, doc_id: int) -> None:
     """Remove all chunks for a document from its collection."""
     try:

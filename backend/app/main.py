@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import chat, documents
+from app.api.routes import chat, documents, quiz
 from app.config import settings
 from app.db import init_db
 
@@ -38,6 +38,7 @@ app.add_middleware(
 
 app.include_router(documents.router)
 app.include_router(chat.router)
+app.include_router(quiz.router)
 
 
 @app.get("/health", tags=["health"])

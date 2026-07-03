@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Sidebar from "./components/layout/Sidebar";
 import Chat from "./pages/Chat";
 import Documents from "./pages/Documents";
+import Quiz from "./pages/Quiz";
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/documents" replace />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/quiz" element={<Quiz />} />
         </Routes>
       </div>
     </div>
