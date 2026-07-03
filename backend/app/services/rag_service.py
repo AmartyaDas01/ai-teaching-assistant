@@ -38,10 +38,15 @@ def get_llm():
 
     from langchain_ollama import ChatOllama
 
+    kwargs = {}
+    if settings.ollama_num_gpu is not None:
+        kwargs["num_gpu"] = settings.ollama_num_gpu
+
     return ChatOllama(
         model=settings.ollama_model,
         base_url=settings.ollama_base_url,
         temperature=0.2,
+        **kwargs,
     )
 
 

@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4o"
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama3"
+    # Force CPU inference by setting to 0 (workaround for Ollama's Metal backend
+    # crashing on older macOS). Leave unset to let Ollama use the GPU.
+    ollama_num_gpu: int | None = None
 
     # Embeddings (local, fixed)
     embedding_provider: str = "local"
