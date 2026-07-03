@@ -91,3 +91,52 @@ export interface AttemptResult {
   total: number;
   graded: GradedQuestion[];
 }
+
+// ─── Analytics ───────────────────────────────────────────────────
+
+export interface BloomPerformance {
+  level: BloomLevel;
+  name: string;
+  accuracy: number;
+  correct: number;
+  total: number;
+}
+
+export interface TimelinePoint {
+  attempt_id: number;
+  date: string;
+  score: number;
+  quiz_title: string;
+  student_name: string;
+}
+
+export interface QuizPerformance {
+  quiz_id: number;
+  title: string;
+  avg_score: number;
+  attempts: number;
+}
+
+export interface HeatmapTopic {
+  quiz_id: number;
+  title: string;
+}
+
+export interface HeatmapCell {
+  student: string;
+  quiz_id: number;
+  score: number;
+}
+
+export interface AnalyticsOverview {
+  num_documents: number;
+  num_quizzes: number;
+  num_attempts: number;
+  avg_score: number;
+  bloom_performance: BloomPerformance[];
+  score_timeline: TimelinePoint[];
+  quiz_performance: QuizPerformance[];
+  heatmap_students: string[];
+  heatmap_topics: HeatmapTopic[];
+  heatmap_cells: HeatmapCell[];
+}

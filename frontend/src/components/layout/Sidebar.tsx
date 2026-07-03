@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   FileText,
   GraduationCap,
   ListChecks,
@@ -11,6 +12,7 @@ const links = [
   { to: "/documents", label: "Documents", Icon: FileText },
   { to: "/chat", label: "Chat", Icon: MessageSquare },
   { to: "/quiz", label: "Quiz Generator", Icon: ListChecks },
+  { to: "/analytics", label: "Analytics", Icon: BarChart3 },
 ];
 
 export default function Sidebar() {

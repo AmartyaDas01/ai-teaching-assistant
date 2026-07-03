@@ -100,3 +100,52 @@ class AttemptResult(BaseModel):
     correct_count: int
     total: int
     graded: list[GradedQuestion]
+
+
+# ─── Analytics ───────────────────────────────────────────────────
+
+class BloomPerformance(BaseModel):
+    level: BloomLevel
+    name: str
+    accuracy: float  # percentage 0-100
+    correct: int
+    total: int
+
+
+class TimelinePoint(BaseModel):
+    attempt_id: int
+    date: datetime
+    score: float
+    quiz_title: str
+    student_name: str
+
+
+class QuizPerformance(BaseModel):
+    quiz_id: int
+    title: str
+    avg_score: float
+    attempts: int
+
+
+class HeatmapTopic(BaseModel):
+    quiz_id: int
+    title: str
+
+
+class HeatmapCell(BaseModel):
+    student: str
+    quiz_id: int
+    score: float  # avg score for that student on that quiz
+
+
+class AnalyticsOverview(BaseModel):
+    num_documents: int
+    num_quizzes: int
+    num_attempts: int
+    avg_score: float
+    bloom_performance: list[BloomPerformance]
+    score_timeline: list[TimelinePoint]
+    quiz_performance: list[QuizPerformance]
+    heatmap_students: list[str]
+    heatmap_topics: list[HeatmapTopic]
+    heatmap_cells: list[HeatmapCell]

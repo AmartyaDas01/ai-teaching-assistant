@@ -1,5 +1,6 @@
 import axios from "axios";
 import type {
+  AnalyticsOverview,
   AttemptResult,
   ChatResponse,
   Document,
@@ -94,4 +95,11 @@ export async function deleteQuiz(id: number): Promise<void> {
 
 export function quizExportUrl(id: number): string {
   return `${baseURL}/quiz/${id}/export`;
+}
+
+// ─── Analytics ───────────────────────────────────────────────────
+
+export async function getAnalytics(): Promise<AnalyticsOverview> {
+  const { data } = await api.get<AnalyticsOverview>("/analytics/overview");
+  return data;
 }
