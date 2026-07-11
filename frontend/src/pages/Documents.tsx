@@ -75,6 +75,12 @@ export default function Documents() {
   }
 
   function handleFiles(files: File[]) {
+    if (!activeCourseId) {
+      setError(
+        "Select a course in the sidebar before uploading — documents are stored per course."
+      );
+      return;
+    }
     const items: UploadItem[] = files.map((file) => ({
       id: `${Date.now()}-${file.name}-${Math.random().toString(36).slice(2, 7)}`,
       file,
@@ -110,6 +116,13 @@ export default function Documents() {
       />
 
       <div className="scroll-slim flex-1 space-y-5 overflow-y-auto p-6">
+        {!activeCourseId && (
+          <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-700">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            Select a course in the sidebar to upload into — documents are organized per
+            course.
+          </div>
+        )}
         <DropZone onFiles={handleFiles} />
 
         {/* Live upload cards */}

@@ -18,24 +18,6 @@ from app.utils.chunker import chunk_pages
 from app.utils.parsers import detect_file_type, extract_text
 from app.vectorstore import chroma_store
 
-DEFAULT_COURSE_NAME = "My Course"
-
-
-def get_or_create_default_course(db: Session, user_id: int) -> Course:
-    course = (
-        db.query(Course)
-        .filter(Course.user_id == user_id)
-        .order_by(Course.id)
-        .first()
-    )
-    if course is None:
-        course = Course(name=DEFAULT_COURSE_NAME, user_id=user_id)
-        db.add(course)
-        db.commit()
-        db.refresh(course)
-    return course
-
-
 def _save_upload(upload: UploadFile) -> str:
     """Persist the uploaded file to disk and return its path."""
     upload_dir = Path(settings.upload_dir)
@@ -50,16 +32,20 @@ def _save_upload(upload: UploadFile) -> str:
 def create_and_ingest(
     db: Session, upload: UploadFile, course_id: int | None, user_id: int
 ) -> Document:
-    """Full upload flow. Raises ValueError for unsupported file types."""
+    """Full upload flow.
+
+    Raises ValueError for unsupported file types, a missing course selection, or a
+    course the user doesn't own. A document is always ingested into an explicitly
+    chosen course's collection — we never guess a default, so an upload can't be
+    silently misrouted to the wrong ChromaDB collection.
+    """
     file_type = detect_file_type(upload.filename or "")
 
-    course = None
-    if course_id:
-        candidate = db.get(Course, course_id)
-        if candidate and candidate.user_id == user_id:
-            course = candidate
-    if course is None:
-        course = get_or_create_default_course(db, user_id)
+    if not course_id:
+        raise ValueError("Select a course before uploading a document.")
+    course = db.get(Course, course_id)
+    if course is None or course.user_id != user_id:
+        raise ValueError("Course not found.")
 
     filepath = _save_upload(upload)
     doc = Document(

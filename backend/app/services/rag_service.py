@@ -104,9 +104,24 @@ def _to_sources(chunks: list[dict]) -> list[Source]:
     return sources
 
 
-def answer_query(question: str, collection_name: str) -> ChatResponse:
+def _retrieve(question: str, collection_names: list[str]) -> list[dict]:
+    """Fan out similarity search across one or more course collections.
+
+    A single course id yields one collection; "All courses" (no selection) yields every
+    collection the user owns. Results are merged and the globally closest TOP_K chunks
+    are kept. Cosine distance is comparable across collections (all use the same local
+    embedding model), so one global sort is valid.
+    """
+    merged: list[dict] = []
+    for name in collection_names:
+        merged.extend(chroma_store.similarity_search(name, question, k=TOP_K))
+    merged.sort(key=lambda ch: ch["distance"])
+    return merged[:TOP_K]
+
+
+def answer_query(question: str, collection_names: list[str]) -> ChatResponse:
     """Retrieve, generate a grounded answer, and return it with source citations."""
-    chunks = chroma_store.similarity_search(collection_name, question, k=TOP_K)
+    chunks = _retrieve(question, collection_names)
 
     if not chunks:
         return ChatResponse(
