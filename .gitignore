@@ -26,9 +26,6 @@ dist-ssr/
 .vite/
 *.tsbuildinfo
 
-# Claude Code local settings
-.claude/
-
 # Editor / OS
 .DS_Store
 .idea/
@@ -38,6 +35,3 @@ dist-ssr/
 # Logs
 *.log
 npm-debug.log*
-
-# graphify knowledge-graph output
-graphify-out/
