@@ -41,3 +41,6 @@ npm-debug.log*
 
 # graphify knowledge-graph output
 graphify-out/
+
+# Local AI-assistant instructions (not part of the project)
+CLAUDE.md
