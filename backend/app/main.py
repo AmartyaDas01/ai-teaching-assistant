@@ -2,6 +2,7 @@
 
 Registers CORS, routers, and creates DB tables on startup.
 """
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -61,6 +62,22 @@ app.include_router(chat.router)
 app.include_router(quiz.router)
 app.include_router(analytics.router)
 app.include_router(settings_routes.router)
+
+
+class _SuppressHealthAccessLogs(logging.Filter):
+    """Drop access-log lines for /health.
+
+    Render probes the health endpoint every few seconds, and an uptime pinger hits it
+    too. Left alone, those lines bury everything else — the logs become useless for
+    finding the one message you actually need (an SMTP failure, a traceback).
+    Only the access log is filtered; real errors still come through.
+    """
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return "GET /health" not in record.getMessage()
+
+
+logging.getLogger("uvicorn.access").addFilter(_SuppressHealthAccessLogs())
 
 
 @app.get("/health", tags=["health"])
