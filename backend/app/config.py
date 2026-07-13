@@ -29,9 +29,11 @@ class Settings(BaseSettings):
     # crashing on older macOS). Leave unset to let Ollama use the GPU.
     ollama_num_gpu: int | None = None
 
-    # Embeddings (local, fixed)
+    # Embeddings — "local" (sentence-transformers, needs ~1GB RAM) or "openai"
+    # (API-based, tiny/no local footprint so the backend fits a free tier).
     embedding_provider: str = "local"
     local_embedding_model: str = "all-MiniLM-L6-v2"
+    openai_embedding_model: str = "text-embedding-3-small"
 
     # Database
     database_url: str = "sqlite:///./app.db"

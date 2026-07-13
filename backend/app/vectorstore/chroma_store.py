@@ -1,12 +1,14 @@
 """ChromaDB wrapper — one persistent collection per course.
 
-Embeddings are computed locally via sentence-transformers (all-MiniLM-L6-v2). This model
-is fixed by design: mixing embedding models in a collection corrupts similarity search,
-and switching would require re-indexing every document.
+Embeddings come from the provider set by EMBEDDING_PROVIDER: "local"
+(sentence-transformers all-MiniLM-L6-v2, ~1GB RAM) or "openai" (API-based
+text-embedding-3-small, negligible local footprint — lets the backend run on a
+free 512MB tier). The provider is fixed per collection: the two produce different
+vector dimensions (384 vs 1536), so switching requires re-ingesting documents.
 
-The embedding model is loaded lazily on first use so importing this module (and starting
-the API) stays fast and doesn't require the ~90MB download until a document is ingested
-or a query is run.
+The embedding function is built lazily on first use, so importing this module (and
+starting the API) stays fast — the local model isn't downloaded, and no OpenAI call
+is made, until a document is ingested or a query is run.
 """
 from __future__ import annotations
 
@@ -40,9 +42,18 @@ def _get_client() -> chromadb.ClientAPI:
 def _get_embedding_fn() -> embedding_functions.EmbeddingFunction:
     global _embedding_fn
     if _embedding_fn is None:
-        _embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
-            model_name=settings.local_embedding_model
-        )
+        if settings.embedding_provider == "openai" and settings.openai_api_key.strip():
+            # API-based — no local model loaded, so runtime RAM stays tiny.
+            _embedding_fn = embedding_functions.OpenAIEmbeddingFunction(
+                api_key=settings.openai_api_key,
+                model_name=settings.openai_embedding_model,
+            )
+        else:
+            # Local sentence-transformers (default; also the fallback if "openai"
+            # is selected without a key, so local dev never hard-fails).
+            _embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+                model_name=settings.local_embedding_model
+            )
     return _embedding_fn
 
 
