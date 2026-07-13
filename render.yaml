@@ -1,6 +1,10 @@
-# Render Blueprint — backend API + managed Postgres.
-# In production the LLM is OpenAI (Ollama can't run on Render), so set OPENAI_API_KEY.
-# Embeddings stay local (sentence-transformers) inside the container.
+# Render Blueprint — free-tier deploy (backend + static frontend + Postgres).
+# Production LLM + embeddings are both OpenAI (set OPENAI_API_KEY in the dashboard).
+# Using OpenAI embeddings means the local torch model never loads, so the backend
+# fits Render's free 512MB tier. Trade-off: the free tier has NO persistent disk,
+# so ChromaDB vectors + uploaded files live in ephemeral /tmp and are cleared when
+# the service spins down or redeploys — re-upload documents after a restart.
+# (Postgres persists, so accounts/courses/quizzes survive.)
 
 services:
   - type: web
@@ -8,12 +12,8 @@ services:
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    plan: starter # torch/sentence-transformers need more than the free tier
+    plan: free # OpenAI embeddings keep runtime RAM under the free 512MB limit
     healthCheckPath: /health # FastAPI exposes GET /health for Render's probe
-    disk:
-      name: data
-      mountPath: /data
-      sizeGB: 1
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -26,13 +26,14 @@ services:
       - key: LLM_PROVIDER
         value: openai
       - key: EMBEDDING_PROVIDER
-        value: local
+        value: openai # API embeddings — no local model, fits the free tier
       - key: JWT_SECRET_KEY
         generateValue: true
+      # Ephemeral (no persistent disk on the free tier); /tmp is always writable.
       - key: CHROMA_PERSIST_DIR
-        value: /data/chroma
+        value: /tmp/chroma
       - key: UPLOAD_DIR
-        value: /data/uploads
+        value: /tmp/uploads
       # CORS: the backend also allows any *.onrender.com origin via regex (see
       # main.py), so this only needs changing if you add a custom domain.
       - key: FRONTEND_ORIGIN
@@ -61,4 +62,4 @@ services:
 
 databases:
   - name: ai-ta-db
-    plan: starter
+    plan: free # note: Render's free Postgres expires ~90 days after creation
