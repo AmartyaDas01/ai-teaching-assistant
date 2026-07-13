@@ -38,3 +38,6 @@ dist-ssr/
 # Logs
 *.log
 npm-debug.log*
+
+# graphify knowledge-graph output
+graphify-out/
