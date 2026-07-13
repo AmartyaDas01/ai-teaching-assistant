@@ -41,6 +41,13 @@ services:
         sync: false
       - key: JWT_SECRET_KEY
         generateValue: true
+      # Signup email verification. Leave SMTP_USER/SMTP_PASSWORD unset to disable it
+      # (signups are then auto-activated). Gmail needs an App Password, not the
+      # account password.
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
       # Only a scratch dir for the uploaded file during parsing — safe to be ephemeral.
       - key: UPLOAD_DIR
         value: /tmp/uploads

@@ -10,6 +10,7 @@ import type {
   Quiz,
   QuizGenerateRequest,
   QuizSummary,
+  RegisterResponse,
   User,
 } from "../types";
 
@@ -52,13 +53,23 @@ export async function register(
   name: string,
   email: string,
   password: string
-): Promise<AuthToken> {
-  const { data } = await api.post<AuthToken>("/auth/register", {
+): Promise<RegisterResponse> {
+  const { data } = await api.post<RegisterResponse>("/auth/register", {
     name,
     email,
     password,
   });
   return data;
+}
+
+/** Exchange the emailed verification token for a session (clicking the link signs you in). */
+export async function verifyEmail(token: string): Promise<AuthToken> {
+  const { data } = await api.post<AuthToken>("/auth/verify", { token });
+  return data;
+}
+
+export async function resendVerification(email: string): Promise<void> {
+  await api.post("/auth/resend-verification", { email });
 }
 
 export async function login(email: string, password: string): Promise<AuthToken> {

@@ -26,4 +26,11 @@ def get_current_user(
     user = db.get(User, user_id)
     if user is None:
         raise _credentials_error
+    # Defense in depth: login already blocks unverified accounts, but this makes an
+    # unverified user unusable even if a token were obtained some other way.
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Please confirm your email first — check your inbox for the link.",
+        )
     return user

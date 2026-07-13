@@ -58,6 +58,27 @@ class Settings(BaseSettings):
     # CORS
     frontend_origin: str = "http://localhost:5173"
 
+    # Email (signup verification). Gmail: use an App Password, not your login
+    # password (requires 2-Step Verification to be on).
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_user: str = ""  # e.g. you@gmail.com
+    smtp_password: str = ""  # 16-char Gmail App Password
+    smtp_from_name: str = "AI Teaching Assistant"
+    verification_token_expire_hours: int = 24
+    # Reject addresses whose domain has no MX record (catches @gmial.con etc.).
+    check_email_deliverability: bool = True
+
+    @property
+    def email_enabled(self) -> bool:
+        """Verification is only enforced when SMTP is actually configured.
+
+        Without credentials the app stays zero-config: signups are auto-verified so
+        local development and demos keep working instead of dead-ending on an email
+        that can never arrive.
+        """
+        return bool(self.smtp_user.strip() and self.smtp_password.strip())
+
     @property
     def use_openai(self) -> bool:
         """OpenAI is used only when explicitly selected AND a key is present.

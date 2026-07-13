@@ -6,6 +6,7 @@ import Documents from "./pages/Documents";
 import Login from "./pages/Login";
 import Quiz from "./pages/Quiz";
 import Settings from "./pages/Settings";
+import Verify from "./pages/Verify";
 import { useAppStore } from "./store/useAppStore";
 
 // Code-split the analytics page so Recharts loads only when needed.
@@ -22,7 +23,12 @@ export default function App() {
     return () => window.removeEventListener("auth:unauthorized", handler);
   }, [logout]);
 
-  if (!token) return <Login />;
+  if (!token) {
+    // The emailed confirmation link lands here while signed out, so it must resolve
+    // to the verify page rather than being swallowed by the login screen.
+    if (window.location.pathname === "/verify") return <Verify />;
+    return <Login />;
+  }
 
   return (
     <div className="flex h-full bg-[#050505] text-foreground">

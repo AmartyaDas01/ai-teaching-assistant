@@ -25,12 +25,34 @@ class UserOut(BaseModel):
     name: str
     email: EmailStr
     role: str
+    is_verified: bool = True
 
 
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserOut
+
+
+class RegisterResponse(BaseModel):
+    """Signup result.
+
+    When email verification is on, no token is issued — the account is inactive until
+    the emailed link is clicked. When SMTP isn't configured, verification is skipped
+    and a token comes back immediately, so local dev stays zero-config.
+    """
+
+    verification_required: bool
+    message: str
+    token: Token | None = None
+
+
+class VerifyRequest(BaseModel):
+    token: str
+
+
+class ResendRequest(BaseModel):
+    email: EmailStr
 
 
 # ─── Courses ─────────────────────────────────────────────────────

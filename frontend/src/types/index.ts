@@ -3,12 +3,23 @@ export interface User {
   name: string;
   email: string;
   role: string;
+  is_verified: boolean;
 }
 
 export interface AuthToken {
   access_token: string;
   token_type: string;
   user: User;
+}
+
+/**
+ * Signup result. When email verification is on, no token comes back — the account is
+ * inactive until the emailed link is clicked.
+ */
+export interface RegisterResponse {
+  verification_required: boolean;
+  message: string;
+  token: AuthToken | null;
 }
 
 export interface Course {

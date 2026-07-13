@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { resendVerification } from "../../services/api";
 
 export interface NeuralAccessLoginProps {
   mode: "login" | "register";
@@ -7,6 +8,8 @@ export interface NeuralAccessLoginProps {
   password: string;
   loading?: boolean;
   error?: string | null;
+  /** Set when login failed because the account is unverified — offers a resend link. */
+  resendEmail?: string;
   onNameChange: (v: string) => void;
   onEmailChange: (v: string) => void;
   onPasswordChange: (v: string) => void;
@@ -27,12 +30,14 @@ export default function NeuralAccessLogin({
   password,
   loading = false,
   error = null,
+  resendEmail,
   onNameChange,
   onEmailChange,
   onPasswordChange,
   onSubmit,
   onToggleMode,
 }: NeuralAccessLoginProps) {
+  const [resent, setResent] = useState(false);
   // Generate static random blob values once per mount to keep positions stable.
   const blobsData = useMemo(
     () =>
@@ -229,6 +234,23 @@ export default function NeuralAccessLogin({
           padding: 8px 0 8px 12px;
           margin-bottom: 24px;
           background: rgba(255, 107, 107, 0.06);
+        }
+
+        .mercury-wrapper .resend-link {
+          background: none;
+          border: none;
+          padding: 0 0 0 4px;
+          cursor: pointer;
+          font-family: inherit;
+          font-size: 11px;
+          color: #ff6b6b;
+          text-decoration: underline;
+        }
+
+        .mercury-wrapper .resend-link:disabled {
+          cursor: default;
+          text-decoration: none;
+          opacity: 0.75;
         }
 
         /* Mercury submit button */
@@ -438,7 +460,24 @@ export default function NeuralAccessLogin({
             <div className="input-glow" />
           </div>
 
-          {error && <div className="auth-error">{error}</div>}
+          {error && (
+            <div className="auth-error">
+              {error}
+              {resendEmail && (
+                <button
+                  type="button"
+                  className="resend-link"
+                  disabled={resent}
+                  onClick={() => {
+                    void resendVerification(resendEmail);
+                    setResent(true);
+                  }}
+                >
+                  {resent ? "· link sent" : "· resend the link"}
+                </button>
+              )}
+            </div>
+          )}
 
           <div className="submit-wrap">
             <div className="mercury-drop" />
