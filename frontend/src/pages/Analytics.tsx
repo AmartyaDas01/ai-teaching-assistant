@@ -33,7 +33,7 @@ export default function Analytics() {
       />
       <div className="scroll-slim flex-1 overflow-y-auto p-6">
         {loading ? (
-          <div className="flex items-center justify-center py-24 text-slate-400">
+          <div className="flex items-center justify-center py-24 text-muted">
             <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading analytics…
           </div>
         ) : error ? (
@@ -50,25 +50,25 @@ export default function Analytics() {
                 icon={<TrendingUp className="h-5 w-5" />}
                 label="Average score"
                 value={`${data.avg_score}%`}
-                tint="text-emerald-600 bg-emerald-50"
+                tint="text-emerald-400 bg-emerald-500/10"
               />
               <StatCard
                 icon={<Target className="h-5 w-5" />}
                 label="Quiz attempts"
                 value={data.num_attempts}
-                tint="text-primary bg-primary-soft"
+                tint="text-foreground bg-white/10"
               />
               <StatCard
                 icon={<BarChart3 className="h-5 w-5" />}
                 label="Quizzes"
                 value={data.num_quizzes}
-                tint="text-fuchsia-600 bg-fuchsia-50"
+                tint="text-fuchsia-400 bg-fuchsia-500/10"
               />
               <StatCard
                 icon={<FileText className="h-5 w-5" />}
                 label="Documents"
                 value={data.num_documents}
-                tint="text-amber-600 bg-amber-50"
+                tint="text-amber-400 bg-amber-500/10"
               />
             </div>
 
@@ -117,14 +117,14 @@ function StatCard({
   tint: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-card">
+    <div className="rounded-xl border border-white/10 bg-surface p-4 shadow-card">
       <div
         className={`mb-3 flex h-9 w-9 items-center justify-center rounded-lg ${tint}`}
       >
         {icon}
       </div>
-      <div className="text-2xl font-extrabold text-slate-900">{value}</div>
-      <div className="text-xs text-slate-500">{label}</div>
+      <div className="text-2xl font-extrabold text-slate-100">{value}</div>
+      <div className="label-mono text-[11px] text-muted">{label}</div>
     </div>
   );
 }
@@ -139,10 +139,10 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+    <div className="rounded-2xl border border-white/10 bg-surface p-5 shadow-card">
       <div className="mb-4">
-        <h2 className="text-sm font-bold text-slate-900">{title}</h2>
-        {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
+        <h2 className="text-sm font-bold text-slate-100">{title}</h2>
+        {subtitle && <p className="text-xs text-muted">{subtitle}</p>}
       </div>
       {children}
     </div>
@@ -151,12 +151,12 @@ function Panel({
 
 function EmptyState({ hasQuizzes }: { hasQuizzes: boolean }) {
   return (
-    <div className="bg-dotted flex flex-col items-center rounded-xl border border-slate-200 py-20 text-center">
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-card ring-1 ring-slate-200">
-        <BarChart3 className="h-6 w-6 text-slate-400" />
+    <div className="bg-dotted flex flex-col items-center rounded-xl border border-white/10 py-20 text-center">
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-surface shadow-card ring-1 ring-white/10">
+        <BarChart3 className="h-6 w-6 text-slate-500" />
       </div>
-      <p className="text-sm font-medium text-slate-700">No attempts yet</p>
-      <p className="mt-1 max-w-xs text-xs text-slate-500">
+      <p className="text-sm font-medium text-slate-200">No attempts yet</p>
+      <p className="mt-1 max-w-xs text-xs text-muted">
         {hasQuizzes
           ? "Take a quiz on the Quiz Generator page to see performance analytics here."
           : "Generate a quiz, take it, and analytics will appear here."}

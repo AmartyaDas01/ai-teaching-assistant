@@ -33,10 +33,10 @@ export default function Sidebar() {
     : "?";
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col bg-slate-950 text-slate-300">
+    <aside className="flex w-64 shrink-0 flex-col border-r border-white/10 bg-[#070708] text-slate-300">
       {/* Brand */}
       <div className="flex items-center gap-3 px-5 py-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/30">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-black shadow-lg shadow-white/10 ring-1 ring-white/20">
           <GraduationCap className="h-5 w-5" />
         </div>
         <div className="leading-tight">
@@ -49,7 +49,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <div className="px-3 pt-2">
-        <div className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+        <div className="label-mono px-3 pb-2 text-[10px] font-semibold text-slate-600">
           Workspace
         </div>
         <nav className="space-y-1">
@@ -68,7 +68,7 @@ export default function Sidebar() {
               {({ isActive }) => (
                 <>
                   {isActive && (
-                    <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-indigo-400" />
+                    <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-white" />
                   )}
                   <Icon className="h-[18px] w-[18px]" />
                   {label}

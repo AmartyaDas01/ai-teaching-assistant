@@ -18,7 +18,7 @@ const STATUS: Record<
   },
   processing: {
     label: "Processing",
-    className: "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200",
+    className: "bg-amber-500/10 text-amber-400 ring-1 ring-inset ring-amber-500/25",
     Icon: Loader2,
   },
   failed: {
@@ -31,10 +31,10 @@ const STATUS: Record<
 
 // Subtle per-type accent on the file tile
 const TYPE_TINT: Record<string, string> = {
-  pdf: "from-rose-500/15 to-rose-500/5 text-rose-600",
-  docx: "from-sky-500/15 to-sky-500/5 text-sky-600",
-  pptx: "from-orange-500/15 to-orange-500/5 text-orange-600",
-  txt: "from-slate-500/15 to-slate-500/5 text-slate-600",
+  pdf: "from-rose-500/20 to-rose-500/5 text-rose-400",
+  docx: "from-sky-500/20 to-sky-500/5 text-sky-400",
+  pptx: "from-orange-500/20 to-orange-500/5 text-orange-400",
+  txt: "from-slate-400/20 to-slate-400/5 text-slate-300",
 };
 
 interface DocumentCardProps {
@@ -47,7 +47,7 @@ export default function DocumentCard({ doc, onDelete }: DocumentCardProps) {
   const tint = TYPE_TINT[doc.file_type] ?? TYPE_TINT.txt;
 
   return (
-    <div className="group flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-3.5 transition-all duration-150 hover:border-slate-300 hover:shadow-card-hover">
+    <div className="group flex items-center gap-4 rounded-xl border border-white/10 bg-surface p-3.5 transition-all duration-150 hover:border-white/20 hover:shadow-card-hover">
       <div
         className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${tint}`}
       >
@@ -55,16 +55,16 @@ export default function DocumentCard({ doc, onDelete }: DocumentCardProps) {
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-semibold text-slate-900">
+        <div className="truncate text-sm font-semibold text-slate-100">
           {doc.filename}
         </div>
-        <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
-          <span className="font-medium uppercase text-slate-400">
+        <div className="mt-0.5 flex items-center gap-2 text-xs text-muted">
+          <span className="label-mono font-medium text-slate-500">
             {doc.file_type}
           </span>
           {doc.status === "ready" && (
             <>
-              <span className="h-1 w-1 rounded-full bg-slate-300" />
+              <span className="h-1 w-1 rounded-full bg-white/20" />
               <span>
                 {doc.page_count} pages · {doc.chunk_count} chunks
               </span>
@@ -72,7 +72,7 @@ export default function DocumentCard({ doc, onDelete }: DocumentCardProps) {
           )}
           {doc.status === "failed" && doc.error && (
             <>
-              <span className="h-1 w-1 rounded-full bg-slate-300" />
+              <span className="h-1 w-1 rounded-full bg-white/20" />
               <span className="truncate text-destructive">{doc.error}</span>
             </>
           )}

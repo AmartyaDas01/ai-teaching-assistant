@@ -34,17 +34,17 @@ export default function QuizQuestion({
   }
 
   const stateClasses: Record<string, string> = {
-    correct: "border-emerald-400 bg-emerald-50 text-emerald-900",
-    wrong: "border-rose-300 bg-rose-50 text-rose-900",
-    chosen: "border-primary bg-primary-soft text-slate-900",
-    idle: "border-slate-200 bg-white text-slate-700 hover:border-slate-300",
+    correct: "border-emerald-500/50 bg-emerald-500/10 text-emerald-200",
+    wrong: "border-rose-500/50 bg-rose-500/10 text-rose-200",
+    chosen: "border-white/50 bg-white/[0.06] text-slate-100",
+    idle: "border-white/10 bg-surface-2 text-slate-300 hover:border-white/25",
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card">
+    <div className="rounded-xl border border-white/10 bg-surface p-5 shadow-card">
       <div className="mb-3 flex items-start justify-between gap-3">
-        <h3 className="text-sm font-semibold text-slate-900">
-          <span className="mr-2 text-slate-400">Q{index}.</span>
+        <h3 className="text-sm font-semibold text-slate-100">
+          <span className="mr-2 text-slate-500">Q{index}.</span>
           {questionText}
         </h3>
         <BloomsBadge level={bloomLevel} showName={false} className="shrink-0" />
@@ -61,16 +61,16 @@ export default function QuizQuestion({
               className={`flex w-full items-center justify-between gap-2 rounded-lg border px-3.5 py-2.5 text-left text-sm transition-all ${stateClasses[state]} ${reviewing ? "cursor-default" : ""}`}
             >
               <span>{opt}</span>
-              {state === "correct" && <Check className="h-4 w-4 text-emerald-600" />}
-              {state === "wrong" && <X className="h-4 w-4 text-rose-500" />}
+              {state === "correct" && <Check className="h-4 w-4 text-emerald-400" />}
+              {state === "wrong" && <X className="h-4 w-4 text-rose-400" />}
             </button>
           );
         })}
       </div>
 
       {reviewing && graded!.explanation && (
-        <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
-          <span className="font-semibold text-slate-700">Why: </span>
+        <p className="mt-3 rounded-lg bg-white/5 px-3 py-2 text-xs text-slate-300">
+          <span className="font-semibold text-slate-200">Why: </span>
           {graded!.explanation}
         </p>
       )}

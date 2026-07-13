@@ -9,14 +9,16 @@ import {
 } from "recharts";
 import type { BloomPerformance } from "../../types";
 
-// Hex mirror of BLOOM_META dot colors (Recharts needs concrete colors, not classes)
+// Hex mirror of BLOOM_META dot colors (Recharts needs concrete colors, not classes).
+// Brightened to the 400 ramp so each bar reads on the near-black surface; identity is
+// also carried by the x-axis labels (L1·Remember …), so color is never the sole cue.
 const BLOOM_FILL: Record<string, string> = {
-  L1: "#0ea5e9",
-  L2: "#10b981",
-  L3: "#14b8a6",
-  L4: "#f59e0b",
-  L5: "#f97316",
-  L6: "#d946ef",
+  L1: "#38bdf8",
+  L2: "#34d399",
+  L3: "#2dd4bf",
+  L4: "#fbbf24",
+  L5: "#fb923c",
+  L6: "#e879f9",
 };
 
 export default function BloomsDistribution({
@@ -37,9 +39,9 @@ export default function BloomsDistribution({
       <BarChart data={rows} margin={{ top: 8, right: 12, left: -16, bottom: 0 }}>
         <XAxis
           dataKey="label"
-          tick={{ fontSize: 11, fill: "#64748b" }}
+          tick={{ fontSize: 11, fill: "#8a8a92" }}
           tickLine={false}
-          axisLine={{ stroke: "#e2e8f0" }}
+          axisLine={{ stroke: "rgba(255,255,255,0.12)" }}
           interval={0}
           angle={-12}
           textAnchor="end"
@@ -47,18 +49,21 @@ export default function BloomsDistribution({
         />
         <YAxis
           domain={[0, 100]}
-          tick={{ fontSize: 11, fill: "#64748b" }}
+          tick={{ fontSize: 11, fill: "#8a8a92" }}
           tickLine={false}
           axisLine={false}
           unit="%"
         />
         <Tooltip
-          cursor={{ fill: "#f1f5f9" }}
+          cursor={{ fill: "rgba(255,255,255,0.06)" }}
           contentStyle={{
             borderRadius: 12,
-            border: "1px solid #e2e8f0",
+            border: "1px solid rgba(255,255,255,0.12)",
+            backgroundColor: "#17171b",
             fontSize: 12,
           }}
+          labelStyle={{ color: "#ededed" }}
+          itemStyle={{ color: "#ededed" }}
           formatter={(value: number, _n, item: any) => [
             `${value}% (${item.payload.correct}/${item.payload.total})`,
             "Accuracy",

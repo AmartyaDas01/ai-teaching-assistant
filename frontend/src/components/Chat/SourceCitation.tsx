@@ -11,7 +11,7 @@ export default function SourceCitation({ sources }: { sources: Source[] }) {
       {sources.map((s, i) => (
         <details
           key={i}
-          className="rounded-lg border border-border bg-slate-50 px-3 py-1.5 text-xs"
+          className="rounded-lg border border-border bg-white/5 px-3 py-1.5 text-xs"
         >
           <summary className="flex cursor-pointer items-center gap-1.5 font-medium text-foreground/80">
             <FileText className="h-3.5 w-3.5 shrink-0 text-primary" />

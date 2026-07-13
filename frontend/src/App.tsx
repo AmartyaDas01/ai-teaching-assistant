@@ -25,9 +25,9 @@ export default function App() {
   if (!token) return <Login />;
 
   return (
-    <div className="flex h-full bg-slate-950 text-slate-900">
+    <div className="flex h-full bg-[#050505] text-foreground">
       <Sidebar />
-      <div className="m-0 flex min-w-0 flex-1 flex-col overflow-hidden bg-gradient-to-b from-white to-slate-100 md:my-2 md:mr-2 md:rounded-2xl md:border md:border-slate-200 md:shadow-sm">
+      <div className="m-0 flex min-w-0 flex-1 flex-col overflow-hidden bg-gradient-to-b from-[#0d0d0f] to-[#050505] md:my-2 md:mr-2 md:rounded-2xl md:border md:border-white/10 md:shadow-sm">
         <Suspense
           fallback={
             <div className="flex flex-1 items-center justify-center text-sm text-slate-400">

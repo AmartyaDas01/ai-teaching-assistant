@@ -1,27 +1,30 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Design tokens (Modern SaaS: indigo + green + slate) ─────────── */
+/* ─── Design tokens (Mercury: near-black canvas + white accents) ──────
+   Matches the Neural Access login: monochrome, thin luminous borders,
+   white primary actions on black, Inter body + Space Mono micro-labels. */
 :root {
-  --color-primary: #4f46e5; /* indigo-600 */
-  --color-primary-hover: #4338ca; /* indigo-700 */
-  --color-primary-soft: #eef2ff; /* indigo-50  */
-  --color-on-primary: #ffffff;
+  --color-primary: #fafafa; /* near-white — primary CTA surface */
+  --color-primary-hover: #d4d4d4; /* mercury */
+  --color-primary-soft: rgba(255, 255, 255, 0.06);
+  --color-on-primary: #0a0a0a; /* dark text on the white button */
 
-  --color-accent: #16a34a; /* green-600 (success) */
-  --color-accent-soft: #dcfce7; /* green-100 */
+  --color-accent: #34d399; /* emerald — reserved for "ready"/success status */
+  --color-accent-soft: rgba(52, 211, 153, 0.12);
 
-  --color-bg: #f8fafc; /* slate-50  */
-  --color-surface: #ffffff;
-  --color-foreground: #0f172a; /* slate-900 */
-  --color-muted: #64748b; /* slate-500 */
-  --color-border: #e2e8f0; /* slate-200 */
+  --color-bg: #050505; /* app canvas */
+  --color-surface: #0e0e10; /* elevated cards / panels */
+  --color-surface-2: #17171b; /* nested rows, hover fills */
+  --color-foreground: #ededed;
+  --color-muted: #8a8a92; /* dim secondary text */
+  --color-border: rgba(255, 255, 255, 0.1);
 
-  --color-destructive: #dc2626; /* red-600  */
-  --color-destructive-soft: #fee2e2; /* red-100  */
+  --color-destructive: #ff6b6b;
+  --color-destructive-soft: rgba(255, 107, 107, 0.12);
 
   --radius: 0.75rem;
 }
@@ -33,10 +36,16 @@
     height: 100%;
   }
 
+  /* Render native UA controls (select popups, scrollbars, autofill) dark so they
+     match the theme instead of falling back to a light OS chrome. */
+  :root {
+    color-scheme: dark;
+  }
+
   body {
     margin: 0;
-    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
-      "Segoe UI", Roboto, sans-serif;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+      Roboto, sans-serif;
     background-color: var(--color-bg);
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
@@ -45,7 +54,7 @@
 
   /* Visible keyboard focus (a11y §1) */
   :focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid rgba(255, 255, 255, 0.55);
     outline-offset: 2px;
   }
 
@@ -61,35 +70,45 @@
   }
 
   ::selection {
-    background-color: color-mix(in srgb, var(--color-primary) 22%, transparent);
-    color: var(--color-foreground);
+    background-color: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
   }
 }
 
 @layer utilities {
-  /* Thin, unobtrusive scrollbars for content areas */
+  /* Space Mono micro-label — echoes the login's field labels */
+  .label-mono {
+    font-family: "Space Mono", ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  /* Thin, unobtrusive scrollbars for content areas (dark) */
   .scroll-slim {
     scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 transparent;
+    scrollbar-color: #3f3f46 transparent;
   }
   .scroll-slim::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
   .scroll-slim::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1;
+    background-color: #3f3f46;
     border-radius: 9999px;
     border: 2px solid transparent;
     background-clip: content-box;
   }
   .scroll-slim::-webkit-scrollbar-thumb:hover {
-    background-color: #94a3b8;
+    background-color: #52525b;
     background-clip: content-box;
   }
 
-  /* Subtle dotted texture for large empty surfaces */
+  /* Subtle dotted texture for large empty surfaces (light dots on dark) */
   .bg-dotted {
-    background-image: radial-gradient(rgb(148 163 184 / 0.25) 1px, transparent 1px);
+    background-image: radial-gradient(
+      rgb(255 255 255 / 0.06) 1px,
+      transparent 1px
+    );
     background-size: 18px 18px;
   }
 }

@@ -20,20 +20,20 @@ interface UploadCardProps {
 const STATUS_STYLES = {
   uploading: {
     Icon: ArrowDownCircle,
-    ring: "ring-primary/20",
-    tile: "bg-primary-soft text-primary",
+    ring: "ring-white/15",
+    tile: "bg-white/10 text-foreground",
     bar: "bg-primary",
   },
   success: {
     Icon: CheckCircle,
-    ring: "ring-emerald-200",
-    tile: "bg-emerald-50 text-emerald-600",
+    ring: "ring-emerald-500/25",
+    tile: "bg-emerald-500/10 text-emerald-400",
     bar: "bg-emerald-500",
   },
   error: {
     Icon: XCircle,
-    ring: "ring-rose-200",
-    tile: "bg-rose-50 text-rose-600",
+    ring: "ring-rose-500/25",
+    tile: "bg-rose-500/10 text-rose-400",
     bar: "bg-rose-500",
   },
 } as const;
@@ -55,7 +55,7 @@ export const UploadCard: React.FC<UploadCardProps> = ({
   return (
     <div
       className={clsx(
-        "relative rounded-xl border border-slate-200 bg-white p-4 shadow-card ring-1 ring-inset",
+        "relative rounded-xl border border-white/10 bg-surface p-4 shadow-card ring-1 ring-inset",
         s.ring
       )}
     >
@@ -63,7 +63,7 @@ export const UploadCard: React.FC<UploadCardProps> = ({
         <button
           onClick={onClose}
           aria-label="Dismiss"
-          className="absolute right-3 top-3 rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          className="absolute right-3 top-3 rounded-md p-1 text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200"
         >
           <X className="h-4 w-4" />
         </button>
@@ -84,16 +84,16 @@ export const UploadCard: React.FC<UploadCardProps> = ({
         </div>
 
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
-          <p className="mt-0.5 truncate text-xs text-slate-500">{description}</p>
+          <h3 className="text-sm font-semibold text-slate-100">{title}</h3>
+          <p className="mt-0.5 truncate text-xs text-muted">{description}</p>
 
           {uploading && (
             <div className="mt-3">
-              <div className="mb-1 flex items-center justify-between text-[11px] font-medium text-slate-500">
+              <div className="mb-1 flex items-center justify-between text-[11px] font-medium text-muted">
                 <span>{progress >= 100 ? "Processing…" : "Uploading"}</span>
                 <span>{progress}%</span>
               </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
                 <div
                   className={clsx("h-full rounded-full transition-all duration-200", s.bar)}
                   style={{ width: `${Math.min(progress, 100)}%` }}
@@ -102,7 +102,7 @@ export const UploadCard: React.FC<UploadCardProps> = ({
               <div className="mt-3">
                 <button
                   onClick={onPrimaryButtonClick}
-                  className="text-xs font-semibold text-slate-500 transition-colors hover:text-slate-800"
+                  className="text-xs font-semibold text-muted transition-colors hover:text-slate-200"
                 >
                   {primaryButtonText}
                 </button>
@@ -123,7 +123,7 @@ export const UploadCard: React.FC<UploadCardProps> = ({
           {secondaryButtonText && (
             <button
               onClick={onSecondaryButtonClick}
-              className="rounded-lg px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100"
+              className="rounded-lg px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:bg-white/10"
             >
               {secondaryButtonText}
             </button>

@@ -5,7 +5,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ['"Space Mono"', "ui-monospace", "monospace"],
       },
       colors: {
         // Semantic tokens mapped to CSS variables (single source of truth in index.css)
@@ -19,7 +20,10 @@ export default {
           DEFAULT: "var(--color-accent)",
           soft: "var(--color-accent-soft)",
         },
-        surface: "var(--color-surface)",
+        surface: {
+          DEFAULT: "var(--color-surface)",
+          2: "var(--color-surface-2)",
+        },
         foreground: "var(--color-foreground)",
         muted: "var(--color-muted)",
         border: "var(--color-border)",
@@ -32,9 +36,9 @@ export default {
         xl: "var(--radius)",
       },
       boxShadow: {
-        card: "0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06)",
+        card: "0 1px 0 0 rgb(255 255 255 / 0.03) inset, 0 8px 24px -12px rgb(0 0 0 / 0.7)",
         "card-hover":
-          "0 4px 12px -2px rgb(15 23 42 / 0.08), 0 2px 6px -2px rgb(15 23 42 / 0.06)",
+          "0 1px 0 0 rgb(255 255 255 / 0.05) inset, 0 12px 32px -12px rgb(0 0 0 / 0.8)",
       },
     },
   },

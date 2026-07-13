@@ -38,8 +38,8 @@ export default function DropZone({ onFiles, disabled }: DropZoneProps) {
       }
       className={`group flex cursor-pointer items-center gap-4 rounded-xl border border-dashed p-5 transition-all duration-150 ${
         dragging
-          ? "border-primary bg-primary-soft/60 ring-4 ring-primary/10"
-          : "border-slate-300 bg-white hover:border-primary/50 hover:bg-slate-50"
+          ? "border-white/60 bg-white/[0.06] ring-4 ring-white/10"
+          : "border-white/15 bg-surface hover:border-white/35 hover:bg-white/5"
       } ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
     >
       <input
@@ -57,8 +57,8 @@ export default function DropZone({ onFiles, disabled }: DropZoneProps) {
       <div
         className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors ${
           dragging
-            ? "bg-primary text-white"
-            : "bg-primary-soft text-primary group-hover:bg-primary group-hover:text-white"
+            ? "bg-primary text-primary-fg"
+            : "bg-white/10 text-foreground group-hover:bg-primary group-hover:text-primary-fg"
         }`}
       >
         {disabled ? (
@@ -68,10 +68,10 @@ export default function DropZone({ onFiles, disabled }: DropZoneProps) {
         )}
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-slate-900">
+        <p className="text-sm font-semibold text-slate-100">
           {disabled ? "Uploading…" : "Upload course materials"}
         </p>
-        <p className="mt-0.5 text-xs text-slate-500">
+        <p className="mt-0.5 text-xs text-muted">
           Drag &amp; drop or click — PDF, DOCX, PPTX, TXT
         </p>
       </div>

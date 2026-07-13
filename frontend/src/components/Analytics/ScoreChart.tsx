@@ -23,16 +23,20 @@ export default function ScoreChart({ data }: { data: TimelinePoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={260}>
       <LineChart data={rows} margin={{ top: 8, right: 16, left: -16, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#eef2f6" vertical={false} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="rgba(255,255,255,0.07)"
+          vertical={false}
+        />
         <XAxis
           dataKey="label"
-          tick={{ fontSize: 11, fill: "#64748b" }}
+          tick={{ fontSize: 11, fill: "#8a8a92" }}
           tickLine={false}
-          axisLine={{ stroke: "#e2e8f0" }}
+          axisLine={{ stroke: "rgba(255,255,255,0.12)" }}
         />
         <YAxis
           domain={[0, 100]}
-          tick={{ fontSize: 11, fill: "#64748b" }}
+          tick={{ fontSize: 11, fill: "#8a8a92" }}
           tickLine={false}
           axisLine={false}
           unit="%"
@@ -40,9 +44,12 @@ export default function ScoreChart({ data }: { data: TimelinePoint[] }) {
         <Tooltip
           contentStyle={{
             borderRadius: 12,
-            border: "1px solid #e2e8f0",
+            border: "1px solid rgba(255,255,255,0.12)",
+            backgroundColor: "#17171b",
             fontSize: 12,
           }}
+          labelStyle={{ color: "#ededed" }}
+          itemStyle={{ color: "#ededed" }}
           formatter={(value: number) => [`${value}%`, "Score"]}
           labelFormatter={(_l, p: any) =>
             p?.[0]?.payload
@@ -53,10 +60,10 @@ export default function ScoreChart({ data }: { data: TimelinePoint[] }) {
         <Line
           type="monotone"
           dataKey="score"
-          stroke="#4f46e5"
+          stroke="#e4e4e7"
           strokeWidth={2.5}
-          dot={{ r: 4, fill: "#4f46e5", strokeWidth: 0 }}
-          activeDot={{ r: 6 }}
+          dot={{ r: 4, fill: "#e4e4e7", strokeWidth: 0 }}
+          activeDot={{ r: 6, fill: "#ffffff" }}
         />
       </LineChart>
     </ResponsiveContainer>

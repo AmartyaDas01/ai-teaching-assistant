@@ -25,11 +25,11 @@ export default function TopicHeatmap({
       <table className="w-full border-separate border-spacing-1 text-xs">
         <thead>
           <tr>
-            <th className="w-32 text-left font-medium text-slate-400">Student</th>
+            <th className="w-32 text-left font-medium text-muted">Student</th>
             {topics.map((t) => (
               <th
                 key={t.quiz_id}
-                className="px-1 text-center font-medium text-slate-500"
+                className="px-1 text-center font-medium text-muted"
                 title={t.title}
               >
                 Q{t.quiz_id}
@@ -40,7 +40,7 @@ export default function TopicHeatmap({
         <tbody>
           {students.map((student) => (
             <tr key={student}>
-              <td className="max-w-32 truncate pr-2 font-medium text-slate-700">
+              <td className="max-w-32 truncate pr-2 font-medium text-slate-200">
                 {student}
               </td>
               {topics.map((t) => {
@@ -48,7 +48,7 @@ export default function TopicHeatmap({
                 return (
                   <td key={t.quiz_id} className="p-0">
                     {score === undefined ? (
-                      <div className="flex h-9 items-center justify-center rounded-md bg-slate-100 text-slate-300">
+                      <div className="flex h-9 items-center justify-center rounded-md bg-white/5 text-slate-600">
                         –
                       </div>
                     ) : (
@@ -67,7 +67,7 @@ export default function TopicHeatmap({
           ))}
         </tbody>
       </table>
-      <div className="mt-3 flex items-center gap-2 text-[11px] text-slate-400">
+      <div className="mt-3 flex items-center gap-2 text-[11px] text-muted">
         <span>Weak</span>
         <span
           className="h-2 w-24 rounded-full"

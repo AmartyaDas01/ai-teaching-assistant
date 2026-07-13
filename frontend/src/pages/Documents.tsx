@@ -108,7 +108,7 @@ export default function Documents() {
         subtitle="Upload and manage course materials"
         action={
           docs.length > 0 ? (
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-slate-300">
               {docs.length} {docs.length === 1 ? "document" : "documents"}
             </span>
           ) : undefined
@@ -117,7 +117,7 @@ export default function Documents() {
 
       <div className="scroll-slim flex-1 space-y-5 overflow-y-auto p-6">
         {!activeCourseId && (
-          <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-700">
+          <div className="flex items-center gap-2 rounded-lg border border-amber-500/25 bg-amber-500/10 px-4 py-2.5 text-sm text-amber-300">
             <AlertCircle className="h-4 w-4 shrink-0" />
             Select a course in the sidebar to upload into — documents are organized per
             course.
@@ -181,12 +181,12 @@ export default function Documents() {
         )}
 
         {docs.length === 0 && uploads.length === 0 ? (
-          <div className="bg-dotted flex flex-col items-center rounded-xl border border-slate-200 py-16 text-center">
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-card ring-1 ring-slate-200">
-              <FolderOpen className="h-6 w-6 text-slate-400" />
+          <div className="bg-dotted flex flex-col items-center rounded-xl border border-white/10 py-16 text-center">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-surface shadow-card ring-1 ring-white/10">
+              <FolderOpen className="h-6 w-6 text-slate-500" />
             </div>
-            <p className="text-sm font-medium text-slate-700">No documents yet</p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="text-sm font-medium text-slate-200">No documents yet</p>
+            <p className="mt-1 text-xs text-muted">
               Upload your first lecture above to start chatting with it.
             </p>
           </div>

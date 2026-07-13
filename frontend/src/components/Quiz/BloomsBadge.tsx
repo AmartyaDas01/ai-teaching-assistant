@@ -4,12 +4,12 @@ export const BLOOM_META: Record<
   BloomLevel,
   { name: string; className: string; dot: string }
 > = {
-  L1: { name: "Remember", className: "bg-sky-50 text-sky-700 ring-sky-200", dot: "bg-sky-500" },
-  L2: { name: "Understand", className: "bg-emerald-50 text-emerald-700 ring-emerald-200", dot: "bg-emerald-500" },
-  L3: { name: "Apply", className: "bg-teal-50 text-teal-700 ring-teal-200", dot: "bg-teal-500" },
-  L4: { name: "Analyze", className: "bg-amber-50 text-amber-700 ring-amber-200", dot: "bg-amber-500" },
-  L5: { name: "Evaluate", className: "bg-orange-50 text-orange-700 ring-orange-200", dot: "bg-orange-500" },
-  L6: { name: "Create", className: "bg-fuchsia-50 text-fuchsia-700 ring-fuchsia-200", dot: "bg-fuchsia-500" },
+  L1: { name: "Remember", className: "bg-sky-500/15 text-sky-300 ring-sky-500/30", dot: "bg-sky-400" },
+  L2: { name: "Understand", className: "bg-emerald-500/15 text-emerald-300 ring-emerald-500/30", dot: "bg-emerald-400" },
+  L3: { name: "Apply", className: "bg-teal-500/15 text-teal-300 ring-teal-500/30", dot: "bg-teal-400" },
+  L4: { name: "Analyze", className: "bg-amber-500/15 text-amber-300 ring-amber-500/30", dot: "bg-amber-400" },
+  L5: { name: "Evaluate", className: "bg-orange-500/15 text-orange-300 ring-orange-500/30", dot: "bg-orange-400" },
+  L6: { name: "Create", className: "bg-fuchsia-500/15 text-fuchsia-300 ring-fuchsia-500/30", dot: "bg-fuchsia-400" },
 };
 
 interface BloomsBadgeProps {
