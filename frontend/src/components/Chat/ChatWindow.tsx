@@ -32,7 +32,7 @@ export default function ChatWindow({ messages, loading, onSend }: ChatWindowProp
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="scroll-slim flex-1 space-y-5 overflow-y-auto p-6">
+      <div className="scroll-slim flex-1 space-y-5 overflow-y-auto p-4 sm:p-6">
         {messages.length === 0 && (
           <div className="mx-auto mt-20 flex max-w-md flex-col items-center text-center">
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-black shadow-lg shadow-white/10 ring-1 ring-white/20">

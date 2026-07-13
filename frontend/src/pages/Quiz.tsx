@@ -85,7 +85,7 @@ export default function Quiz() {
         }
       />
 
-      <div className="scroll-slim flex-1 overflow-y-auto p-6">
+      <div className="scroll-slim flex-1 overflow-y-auto p-4 sm:p-6">
         {error && (
           <div className="mx-auto mb-4 flex max-w-2xl items-center gap-2 rounded-lg border border-destructive/20 bg-destructive-soft px-4 py-2.5 text-sm text-destructive">
             <AlertCircle className="h-4 w-4 shrink-0" />
@@ -157,7 +157,7 @@ function ScoreCard({ result, quizId }: { result: AttemptResult; quizId: number }
   const tone =
     pct >= 80 ? "text-emerald-400" : pct >= 50 ? "text-amber-400" : "text-rose-400";
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-surface p-6 shadow-card">
+    <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-surface p-5 shadow-card sm:p-6">
       <div>
         <div className="label-mono text-xs font-semibold text-slate-500">
           Your score

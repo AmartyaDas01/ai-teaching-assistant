@@ -92,7 +92,10 @@ export default function NeuralAccessLogin({
           color: var(--accent);
           font-family: 'Inter', sans-serif;
           height: 100vh;
-          width: 100vw;
+          /* dvh accounts for mobile browser chrome (the address bar), which makes a
+             plain 100vh overflow and clip the form on phones. */
+          height: 100dvh;
+          width: 100%;
           overflow: hidden;
           display: flex;
           align-items: center;
@@ -314,6 +317,34 @@ export default function NeuralAccessLogin({
           position: absolute;
           width: 0;
           height: 0;
+        }
+
+        /* Phones: the 40px gutter and 3rem hero overflow a 360-390px screen. */
+        @media (max-width: 480px) {
+          .mercury-wrapper .auth-container {
+            padding: 24px;
+          }
+          .mercury-wrapper .header {
+            margin-bottom: 32px;
+          }
+          .mercury-wrapper .header h1 {
+            font-size: 2.25rem;
+            letter-spacing: -1px;
+            margin-left: -2px;
+          }
+          .mercury-wrapper .form-group {
+            margin-bottom: 24px;
+          }
+          /* The focus nudge shifts the field toward the edge on a narrow screen. */
+          .mercury-wrapper .form-group:focus-within {
+            transform: none;
+          }
+          .mercury-wrapper .btn-base {
+            padding: 18px 24px;
+          }
+          .mercury-wrapper .footer-nav {
+            gap: 12px;
+          }
         }
       `}</style>
 

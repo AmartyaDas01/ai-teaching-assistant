@@ -115,7 +115,7 @@ export default function Documents() {
         }
       />
 
-      <div className="scroll-slim flex-1 space-y-5 overflow-y-auto p-6">
+      <div className="scroll-slim flex-1 space-y-5 overflow-y-auto p-4 sm:p-6">
         {!activeCourseId && (
           <div className="flex items-center gap-2 rounded-lg border border-amber-500/25 bg-amber-500/10 px-4 py-2.5 text-sm text-amber-300">
             <AlertCircle className="h-4 w-4 shrink-0" />

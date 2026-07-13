@@ -32,7 +32,7 @@ export default function Settings() {
   return (
     <>
       <Navbar title="Settings" subtitle="Configure the AI provider" />
-      <div className="scroll-slim flex-1 overflow-y-auto p-6">
+      <div className="scroll-slim flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="mx-auto max-w-xl space-y-6">
           <div className="rounded-2xl border border-white/10 bg-surface p-5 shadow-card">
             <div className="mb-1 flex items-center gap-2">

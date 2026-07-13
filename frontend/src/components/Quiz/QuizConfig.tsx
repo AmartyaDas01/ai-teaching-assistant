@@ -45,7 +45,7 @@ export default function QuizConfig({ onGenerate, generating }: QuizConfigProps) 
     documentId !== null && levels.length > 0 && !generating;
 
   return (
-    <div className="mx-auto w-full max-w-xl rounded-2xl border border-white/10 bg-surface p-6 shadow-card">
+    <div className="mx-auto w-full max-w-xl rounded-2xl border border-white/10 bg-surface p-5 shadow-card sm:p-6">
       <h2 className="text-base font-bold text-slate-100">Generate a quiz</h2>
       <p className="mt-0.5 text-sm text-muted">
         Auto-create Bloom's Taxonomy-aligned MCQs from a document.
@@ -72,7 +72,7 @@ export default function QuizConfig({ onGenerate, generating }: QuizConfigProps) 
           </div>
 
           {/* Count + difficulty */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-slate-300">
                 Questions: {numQuestions}

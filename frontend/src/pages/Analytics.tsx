@@ -31,7 +31,7 @@ export default function Analytics() {
         title="Analytics"
         subtitle="Student performance & weak-area insights"
       />
-      <div className="scroll-slim flex-1 overflow-y-auto p-6">
+      <div className="scroll-slim flex-1 overflow-y-auto p-4 sm:p-6">
         {loading ? (
           <div className="flex items-center justify-center py-24 text-muted">
             <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading analytics…

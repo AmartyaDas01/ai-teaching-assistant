@@ -80,7 +80,7 @@ export default function DocumentCard({ doc, onDelete }: DocumentCardProps) {
       </div>
 
       <span
-        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${status.className}`}
+        className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium `}
       >
         <status.Icon
           className={`h-3.5 w-3.5 ${doc.status === "processing" ? "animate-spin" : ""}`}
@@ -90,7 +90,7 @@ export default function DocumentCard({ doc, onDelete }: DocumentCardProps) {
 
       <button
         onClick={() => onDelete(doc.id)}
-        className="rounded-lg p-2 text-slate-400 opacity-0 transition-all duration-150 hover:bg-destructive-soft hover:text-destructive focus-visible:opacity-100 group-hover:opacity-100"
+        className="rounded-lg p-2 text-slate-400 opacity-100 transition-all duration-150 hover:bg-destructive-soft hover:text-destructive focus-visible:opacity-100 md:opacity-0 md:group-hover:opacity-100"
         title="Delete document"
         aria-label={`Delete ${doc.filename}`}
       >
