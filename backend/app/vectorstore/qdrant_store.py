@@ -19,6 +19,7 @@ from qdrant_client.models import (
     Filter,
     FilterSelector,
     MatchValue,
+    PayloadSchemaType,
     PointStruct,
     VectorParams,
 )
@@ -52,6 +53,19 @@ def _ensure_collection(name: str) -> None:
                 size=embedding_dim(), distance=Distance.COSINE
             ),
         )
+    # A real Qdrant server refuses to filter on an un-indexed payload field (400:
+    # "Index required but not found"), which get_document_chunks and delete_document
+    # both do on doc_id. The in-memory client is lenient, so this only shows up
+    # against a live cluster. Creating an existing index is a no-op, so this is safe
+    # to call every time (and also back-fills collections made before this fix).
+    try:
+        client.create_payload_index(
+            collection_name=name,
+            field_name="doc_id",
+            field_schema=PayloadSchemaType.INTEGER,
+        )
+    except Exception:  # noqa: BLE001 - index already present, or a transient race
+        pass
 
 
 def _doc_filter(doc_id: int) -> Filter:
