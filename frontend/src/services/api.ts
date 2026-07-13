@@ -13,7 +13,10 @@ import type {
   User,
 } from "../types";
 
-const baseURL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+// Render's fromService injects a bare host (no scheme); default it to https://.
+// Locally VITE_API_URL is unset, so we fall back to the dev backend.
+const rawApiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+const baseURL = /^https?:\/\//.test(rawApiUrl) ? rawApiUrl : `https://${rawApiUrl}`;
 
 export const api = axios.create({ baseURL });
 

@@ -33,12 +33,22 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Normalize the configured origin: tolerate a bare host (e.g. from Render's
+# fromService, which has no scheme) by defaulting it to https://.
+_frontend_origin = settings.frontend_origin.strip().rstrip("/")
+if _frontend_origin and not _frontend_origin.startswith("http"):
+    _frontend_origin = f"https://{_frontend_origin}"
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_origin],
-    # Also accept any localhost port so Vite's dev-server port-hopping
-    # (5173 -> 5174 -> ...) doesn't break the frontend in local dev.
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
+    allow_origins=[_frontend_origin] if _frontend_origin else [],
+    # Also accept: any localhost port (Vite's dev-server port-hopping
+    # 5173 -> 5174 -> ...), and any *.onrender.com origin so the Render-hosted
+    # frontend works without hand-wiring its exact subdomain here.
+    allow_origin_regex=(
+        r"http://(localhost|127\.0\.0\.1):\d+"
+        r"|https://[a-z0-9-]+\.onrender\.com"
+    ),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

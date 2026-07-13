@@ -33,8 +33,31 @@ services:
         value: /data/chroma
       - key: UPLOAD_DIR
         value: /data/uploads
+      # CORS: the backend also allows any *.onrender.com origin via regex (see
+      # main.py), so this only needs changing if you add a custom domain.
       - key: FRONTEND_ORIGIN
-        value: https://REPLACE-with-your-vercel-domain.vercel.app
+        value: https://ai-ta-frontend.onrender.com
+
+  # Frontend — static site (Vite build served from Render's CDN).
+  - type: web
+    name: ai-ta-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      # Baked into the Vite build. Render resolves this to the backend's host
+      # (no scheme); api.ts prepends https://. Auto-wired — no manual copy.
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: ai-ta-backend
+          property: host
+    routes:
+      # SPA fallback so React Router deep links resolve to index.html.
+      - type: rewrite
+        source: /*
+        destination: /index.html
 
 databases:
   - name: ai-ta-db
