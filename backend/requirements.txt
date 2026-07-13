@@ -22,6 +22,9 @@ langchain-openai==0.2.10
 langchain-chroma==0.1.4
 langchain-ollama==0.2.1
 chromadb==0.5.20
+# Remote vector store (VECTOR_STORE=qdrant) — persists vectors off-disk, so they
+# survive restarts on hosts with no persistent disk (free tiers).
+qdrant-client==1.18.0
 
 # Embeddings (local)
 sentence-transformers==3.3.1

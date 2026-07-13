@@ -38,8 +38,13 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "sqlite:///./app.db"
 
-    # Vector store
+    # Vector store — "chroma" (local, on-disk) or "qdrant" (remote, survives
+    # restarts on hosts without a persistent disk).
+    vector_store: str = "chroma"
     chroma_persist_dir: str = "./chroma_data"
+    # Qdrant (only used when vector_store="qdrant"). Empty URL => in-memory.
+    qdrant_url: str = ""
+    qdrant_api_key: str = ""
 
     # Auth
     jwt_secret_key: str = "dev-secret-change-me"

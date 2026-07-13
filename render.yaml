@@ -1,10 +1,16 @@
-# Render Blueprint — free-tier deploy (backend + static frontend + Postgres).
-# Production LLM + embeddings are both OpenAI (set OPENAI_API_KEY in the dashboard).
-# Using OpenAI embeddings means the local torch model never loads, so the backend
-# fits Render's free 512MB tier. Trade-off: the free tier has NO persistent disk,
-# so ChromaDB vectors + uploaded files live in ephemeral /tmp and are cleared when
-# the service spins down or redeploys — re-upload documents after a restart.
-# (Postgres persists, so accounts/courses/quizzes survive.)
+# Render Blueprint — free-tier deploy, fully persistent.
+#
+# Everything runs on free plans, and nothing is lost on restart:
+#   - LLM + embeddings : OpenAI (OpenAI embeddings mean the local torch model never
+#                        loads, so the backend fits Render's free 512MB tier)
+#   - vectors          : Qdrant Cloud (free 1GB) — remote, so they survive the free
+#                        tier's lack of a persistent disk
+#   - Postgres         : Neon (free, permanent) — Render's free DB expires in ~90d
+#
+# Set these three secrets in the Render dashboard: OPENAI_API_KEY, QDRANT_URL +
+# QDRANT_API_KEY, and DATABASE_URL (the Neon connection string).
+# Only /tmp/uploads is ephemeral — it just holds the uploaded file while it's being
+# parsed, and isn't needed once the chunks are embedded into Qdrant.
 
 services:
   - type: web
@@ -15,10 +21,9 @@ services:
     plan: free # OpenAI embeddings keep runtime RAM under the free 512MB limit
     healthCheckPath: /health # FastAPI exposes GET /health for Render's probe
     envVars:
+      # Neon Postgres connection string (free + permanent). Paste in the dashboard.
       - key: DATABASE_URL
-        fromDatabase:
-          name: ai-ta-db
-          property: connectionString
+        sync: false
       - key: OPENAI_API_KEY
         sync: false # set this in the Render dashboard
       - key: OPENAI_MODEL
@@ -27,11 +32,16 @@ services:
         value: openai
       - key: EMBEDDING_PROVIDER
         value: openai # API embeddings — no local model, fits the free tier
+      # Vectors live in Qdrant Cloud, so they survive restarts (no disk on free).
+      - key: VECTOR_STORE
+        value: qdrant
+      - key: QDRANT_URL
+        sync: false # e.g. https://xxxx.cloud.qdrant.io:6333
+      - key: QDRANT_API_KEY
+        sync: false
       - key: JWT_SECRET_KEY
         generateValue: true
-      # Ephemeral (no persistent disk on the free tier); /tmp is always writable.
-      - key: CHROMA_PERSIST_DIR
-        value: /tmp/chroma
+      # Only a scratch dir for the uploaded file during parsing — safe to be ephemeral.
       - key: UPLOAD_DIR
         value: /tmp/uploads
       # CORS: the backend also allows any *.onrender.com origin via regex (see
@@ -60,6 +70,5 @@ services:
         source: /*
         destination: /index.html
 
-databases:
-  - name: ai-ta-db
-    plan: free # note: Render's free Postgres expires ~90 days after creation
+# No `databases:` block on purpose — Render's free Postgres expires after ~90 days.
+# Postgres is Neon instead (free + permanent); paste its URL into DATABASE_URL.

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from app.config import settings
 from app.schemas import ChatResponse, Source
-from app.vectorstore import chroma_store
+from app.vectorstore import store
 
 TOP_K = 5
 
@@ -114,7 +114,7 @@ def _retrieve(question: str, collection_names: list[str]) -> list[dict]:
     """
     merged: list[dict] = []
     for name in collection_names:
-        merged.extend(chroma_store.similarity_search(name, question, k=TOP_K))
+        merged.extend(store.similarity_search(name, question, k=TOP_K))
     merged.sort(key=lambda ch: ch["distance"])
     return merged[:TOP_K]
 

@@ -16,7 +16,8 @@ from app.models.course import Course
 from app.models.document import Document
 from app.utils.chunker import chunk_pages
 from app.utils.parsers import detect_file_type, extract_text
-from app.vectorstore import chroma_store
+from app.vectorstore import store
+
 
 def _save_upload(upload: UploadFile) -> str:
     """Persist the uploaded file to disk and return its path."""
@@ -69,7 +70,7 @@ def ingest_document(db: Session, doc: Document, course: Course) -> None:
     try:
         pages = extract_text(doc.filepath, doc.file_type)
         chunks = chunk_pages(pages)
-        added = chroma_store.add_chunks(
+        added = store.add_chunks(
             collection_name=course.collection_name,
             doc_id=doc.id,
             course_id=course.id,
@@ -92,7 +93,7 @@ def ingest_document(db: Session, doc: Document, course: Course) -> None:
 def delete_document(db: Session, doc: Document) -> None:
     """Remove a document's vectors, file, and DB row."""
     if doc.chroma_collection_id:
-        chroma_store.delete_document(doc.chroma_collection_id, doc.id)
+        store.delete_document(doc.chroma_collection_id, doc.id)
     try:
         Path(doc.filepath).unlink(missing_ok=True)
     except OSError:

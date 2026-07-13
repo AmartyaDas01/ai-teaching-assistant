@@ -7,7 +7,7 @@ from app.deps import get_current_user
 from app.models.course import Course
 from app.models.user import User
 from app.schemas import CourseCreate, CourseOut
-from app.vectorstore import chroma_store
+from app.vectorstore import store
 
 router = APIRouter(prefix="/courses", tags=["courses"])
 
@@ -50,6 +50,6 @@ def delete_course(
     if course is None or course.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Course not found")
     # Drop the course's vector collection, then the DB rows (documents/quizzes cascade).
-    chroma_store.delete_collection(course.collection_name)
+    store.delete_collection(course.collection_name)
     db.delete(course)
     db.commit()

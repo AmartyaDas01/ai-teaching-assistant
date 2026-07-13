@@ -21,7 +21,7 @@ from app.schemas import (
     SubmitRequest,
 )
 from app.services import rag_service
-from app.vectorstore import chroma_store
+from app.vectorstore import store
 
 BLOOM_DEFINITIONS = {
     "L1": "Remember — recall facts, terms, and basic concepts",
@@ -172,7 +172,7 @@ def generate_quiz(db: Session, req: QuizGenerateRequest, user_id: int) -> Quiz:
     if doc.status != "ready" or not doc.chroma_collection_id:
         raise QuizGenerationError("Document is not ready — wait for processing to finish.")
 
-    chunks = chroma_store.get_document_chunks(
+    chunks = store.get_document_chunks(
         doc.chroma_collection_id, doc.id, limit=MAX_CONTEXT_CHUNKS
     )
     if not chunks:
