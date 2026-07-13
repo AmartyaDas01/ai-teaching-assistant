@@ -17,7 +17,17 @@ connect_args = (
     {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
 )
 
-engine = create_engine(settings.database_url, connect_args=connect_args)
+# pool_pre_ping tests a pooled connection before handing it out. Serverless Postgres
+# (Neon) suspends when idle and drops open connections, so without this the first
+# request after a quiet period gets a dead connection and fails with a 500. Pre-ping
+# detects that and transparently reconnects. pool_recycle retires connections before
+# they get old enough to be dropped in the first place.
+engine = create_engine(
+    settings.database_url,
+    connect_args=connect_args,
+    pool_pre_ping=True,
+    pool_recycle=300,
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
