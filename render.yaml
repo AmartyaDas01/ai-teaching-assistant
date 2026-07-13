@@ -57,13 +57,13 @@ services:
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:
-      # Baked into the Vite build. Render resolves this to the backend's host
-      # (no scheme); api.ts prepends https://. Auto-wired — no manual copy.
+      # Baked into the Vite build at build time.
+      # NOTE: `fromService … property: host` resolves to the *service name* only
+      # (e.g. "ai-ta-backend-k7bj"), not the public hostname — which produced an
+      # unresolvable baseURL. Set the public URL explicitly instead. If you rename
+      # the backend service or use a custom domain, update this value.
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: ai-ta-backend
-          property: host
+        value: https://ai-ta-backend-k7bj.onrender.com
     routes:
       # SPA fallback so React Router deep links resolve to index.html.
       - type: rewrite

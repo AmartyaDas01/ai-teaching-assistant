@@ -65,8 +65,22 @@ app.include_router(settings_routes.router)
 
 @app.get("/health", tags=["health"])
 def health() -> dict:
+    """Report the *active* providers, so a deploy can be checked at a glance.
+
+    This previously always reported the local embedding model, which hid the case
+    where a misconfigured deploy silently fell back to a different provider.
+    """
+    openai_embeddings = (
+        settings.embedding_provider == "openai" and bool(settings.openai_api_key.strip())
+    )
     return {
         "status": "ok",
         "llm_provider": "openai" if settings.use_openai else "ollama",
-        "embedding_model": settings.local_embedding_model,
+        "embedding_provider": "openai" if openai_embeddings else "local",
+        "embedding_model": (
+            settings.openai_embedding_model
+            if openai_embeddings
+            else settings.local_embedding_model
+        ),
+        "vector_store": settings.vector_store,
     }
