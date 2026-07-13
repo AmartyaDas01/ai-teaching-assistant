@@ -9,6 +9,7 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     plan: starter # torch/sentence-transformers need more than the free tier
+    healthCheckPath: /health # FastAPI exposes GET /health for Render's probe
     disk:
       name: data
       mountPath: /data

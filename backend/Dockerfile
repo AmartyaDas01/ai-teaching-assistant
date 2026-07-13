@@ -18,4 +18,6 @@ COPY app ./app
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Bind to the platform-provided $PORT (Render/Cloud Run set this); fall back to 8000
+# for local runs and Docker Compose. Shell form so ${PORT} is expanded at runtime.
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
