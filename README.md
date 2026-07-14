@@ -13,6 +13,12 @@ analytics layer that surfaces which topics a cohort is struggling with.
 Built by **Amartya Das** — Assistant Professor, Dept. of Computer Science &
 Engineering, Dayananda Sagar University, Bangalore.
 
+**[▶ Live demo](https://ai-ta-frontend.onrender.com)**
+
+<!-- Record a ~60s walkthrough, save it as docs/demo.gif, and uncomment:
+![Demo](docs/demo.gif)
+-->
+
 ---
 
 ## Features
@@ -153,6 +159,25 @@ with no keys at all. To get *answers*, you need either an `OPENAI_API_KEY` in `.
 a running [Ollama](https://ollama.com) (`ollama pull llama3`).
 
 ---
+
+## Tests
+
+```bash
+cd backend
+pip install -r requirements-dev.txt
+pytest
+```
+
+42 tests covering auth, ingestion, retrieval, quiz generation, scoring, the public
+student link, analytics and the chunker. The LLM is stubbed: tests must be deterministic
+and free — a real model phrases questions differently on every run and would bill each
+CI push — while everything around it (chunking, embedding, retrieval, JSON repair,
+scoring, aggregation) runs for real.
+
+The bugs that actually shipped are encoded as tests so they cannot return: uploading with
+no course selected silently routing vectors into the wrong collection, "All courses" chat
+failing to fan out, the answer key leaking to a student, and an emailed verification token
+being usable as an API credential.
 
 ## Configuration
 
