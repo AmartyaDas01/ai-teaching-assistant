@@ -321,6 +321,16 @@ export default function NeuralAccessLogin({
           width: 100%;
         }
 
+        /* Scopes the glow to the input when a status message follows the field. */
+        .mercury-wrapper .input-wrap {
+          position: relative;
+          display: block;
+        }
+
+        .mercury-wrapper .input-wrap input:focus ~ .input-glow {
+          width: 100%;
+        }
+
         /* Inline field status. Flows in normal document order rather than being
            absolutely positioned: at 30px field spacing an absolute note would collide
            with the next label on a two-line message. */
@@ -562,18 +572,23 @@ export default function NeuralAccessLogin({
 
           <div className="form-group">
             <label htmlFor="na-email">Email</label>
-            <input
-              id="na-email"
-              type="email"
-              autoComplete="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => onEmailChange(e.target.value)}
-              aria-invalid={emailState === "invalid"}
-              aria-describedby="na-email-status"
-              required
-            />
-            <div className="input-glow" />
+            {/* The glow bar is anchored to the bottom of its positioned parent. It has
+                to be scoped to the input, or the status message below pushes the field
+                group taller and the bar drifts down under the text. */}
+            <div className="input-wrap">
+              <input
+                id="na-email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => onEmailChange(e.target.value)}
+                aria-invalid={emailState === "invalid"}
+                aria-describedby="na-email-status"
+                required
+              />
+              <div className="input-glow" />
+            </div>
 
             <div id="na-email-status" role="status" aria-live="polite">
               {emailState === "checking" && (
