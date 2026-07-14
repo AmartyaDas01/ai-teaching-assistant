@@ -1,5 +1,7 @@
 # AI Teaching Assistant
 
+[![CI](https://github.com/AmartyaDas01/ai-teaching-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/AmartyaDas01/ai-teaching-assistant/actions/workflows/ci.yml)
+
 An AI-powered teaching assistant built for CSE educators. Upload an entire course's
 lecture notes, PDFs and slides, then **chat with the material** (grounded answers with
 source citations), **auto-generate Bloom's Taxonomy-aligned quizzes**, and **track
