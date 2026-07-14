@@ -55,6 +55,17 @@ class ResendRequest(BaseModel):
     email: EmailStr
 
 
+class EmailCheckRequest(BaseModel):
+    # Deliberately a plain str, not EmailStr: a malformed address must come back as a
+    # friendly message, not a 422 the form has to reverse-engineer.
+    email: str
+
+
+class EmailCheckResponse(BaseModel):
+    valid: bool
+    detail: str | None = None
+
+
 # ─── Courses ─────────────────────────────────────────────────────
 
 class CourseCreate(BaseModel):

@@ -8,6 +8,8 @@ from app.db import get_db
 from app.deps import get_current_user
 from app.models.user import User
 from app.schemas import (
+    EmailCheckRequest,
+    EmailCheckResponse,
     RegisterResponse,
     ResendRequest,
     Token,
@@ -59,6 +61,29 @@ def _send_verification(background: BackgroundTasks, user: User) -> None:
     background.add_task(
         email_service.send_verification_email, user.email, user.name, verify_url
     )
+
+
+@router.post("/check-email", response_model=EmailCheckResponse)
+def check_email(payload: EmailCheckRequest):
+    """Is this address real? Used by the signup form while the user types.
+
+    Runs the same validation signup does — including the MX lookup — so a bad domain
+    is caught at the keystroke rather than after a failed submit.
+
+    It deliberately does NOT report whether the address is already registered. That
+    would turn this into an account-enumeration oracle: anyone could probe for valid
+    accounts at will.
+    """
+    email = payload.email.strip()
+    if not email:
+        return EmailCheckResponse(valid=False, detail="Enter an email address.")
+    try:
+        validate_email(
+            email, check_deliverability=settings.check_email_deliverability
+        )
+    except EmailNotValidError as exc:
+        return EmailCheckResponse(valid=False, detail=str(exc))
+    return EmailCheckResponse(valid=True)
 
 
 @router.post("/register", response_model=RegisterResponse, status_code=201)

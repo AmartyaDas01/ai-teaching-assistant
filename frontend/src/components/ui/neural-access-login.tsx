@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { resendVerification } from "../../services/api";
+import { checkEmail, resendVerification } from "../../services/api";
 
 // Practical rather than RFC-exhaustive: the backend does the authoritative check
 // (including an MX lookup). This exists to catch a typo before a round trip.
@@ -71,21 +71,68 @@ export default function NeuralAccessLogin({
   onToggleMode,
 }: NeuralAccessLoginProps) {
   const [resent, setResent] = useState(false);
-  // Don't scold someone mid-keystroke: "a@" is not yet a mistake. The warning appears
-  // once they pause typing, or as soon as they leave the field.
-  const [emailBlurred, setEmailBlurred] = useState(false);
-  const [emailSettled, setEmailSettled] = useState(false);
+
+  /**
+   * Live email verification.
+   *
+   * Two stages, cheapest first: the format is checked in the browser (instant, no
+   * network), and only a well-formed address is sent to the server, which does a real
+   * DNS/MX lookup to prove the domain can actually receive mail.
+   *
+   * The check waits for a pause in typing — validating every keystroke would mean a
+   * DNS lookup per character, and "a@" is not yet a mistake worth scolding.
+   */
+  const [emailState, setEmailState] = useState<
+    "idle" | "checking" | "valid" | "invalid"
+  >("idle");
+  const [emailMessage, setEmailMessage] = useState<string | null>(null);
+  const [suggestion, setSuggestion] = useState<string | null>(null);
 
   useEffect(() => {
-    setEmailSettled(false);
-    if (!email) return;
-    const t = setTimeout(() => setEmailSettled(true), 700);
-    return () => clearTimeout(t);
-  }, [email]);
+    const value = email.trim();
+    setSuggestion(null);
+    setEmailMessage(null);
 
-  const emailIssue = inspectEmail(email);
-  const showEmailIssue =
-    (emailBlurred || emailSettled) && (emailIssue.error || emailIssue.suggestion);
+    if (!value) {
+      setEmailState("idle");
+      return;
+    }
+
+    const local = inspectEmail(value);
+    if (local.error) {
+      // Malformed — no point asking the server about it.
+      setEmailState("invalid");
+      setEmailMessage(local.error);
+      return;
+    }
+
+    setEmailState("checking");
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const result = await checkEmail(value, controller.signal);
+        if (controller.signal.aborted) return;
+        if (result.valid) {
+          setEmailState("valid");
+          // The address is real, but the domain still looks fat-fingered.
+          if (local.suggestion) setSuggestion(local.suggestion);
+        } else {
+          setEmailState("invalid");
+          setEmailMessage(result.detail ?? "That email address doesn't exist.");
+          if (local.suggestion) setSuggestion(local.suggestion);
+        }
+      } catch {
+        // Offline or the request was superseded: never block signup on our own
+        // convenience check — the server validates again at submit anyway.
+        if (!controller.signal.aborted) setEmailState("idle");
+      }
+    }, 700);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [email]);
   // Generate static random blob values once per mount to keep positions stable.
   const blobsData = useMemo(
     () =>
@@ -274,7 +321,7 @@ export default function NeuralAccessLogin({
           width: 100%;
         }
 
-        /* Inline field warning. Flows in normal document order rather than being
+        /* Inline field status. Flows in normal document order rather than being
            absolutely positioned: at 30px field spacing an absolute note would collide
            with the next label on a two-line message. */
         .mercury-wrapper .field-note {
@@ -282,7 +329,18 @@ export default function NeuralAccessLogin({
           font-family: 'Space Mono', monospace;
           font-size: 11px;
           line-height: 1.4;
-          color: #ffb86b;
+        }
+
+        .mercury-wrapper .field-note.error {
+          color: #ff6b6b;
+        }
+
+        .mercury-wrapper .field-note.ok {
+          color: #34d399;
+        }
+
+        .mercury-wrapper .field-note.checking {
+          color: var(--text-dim);
         }
 
         .mercury-wrapper .suggest-link {
@@ -493,7 +551,7 @@ export default function NeuralAccessLogin({
                 id="na-name"
                 type="text"
                 autoComplete="name"
-                placeholder="Your full name"
+                placeholder="Your Name"
                 value={name}
                 onChange={(e) => onNameChange(e.target.value)}
                 required
@@ -508,38 +566,42 @@ export default function NeuralAccessLogin({
               id="na-email"
               type="email"
               autoComplete="email"
-              placeholder="you@university.edu"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => onEmailChange(e.target.value)}
-              onBlur={() => setEmailBlurred(true)}
-              aria-invalid={Boolean(emailIssue.error)}
-              aria-describedby={showEmailIssue ? "na-email-issue" : undefined}
+              aria-invalid={emailState === "invalid"}
+              aria-describedby="na-email-status"
               required
             />
             <div className="input-glow" />
 
-            {showEmailIssue && (
-              <div id="na-email-issue" className="field-note" role="status">
-                {emailIssue.error ? (
-                  emailIssue.error
-                ) : (
-                  <>
-                    Did you mean{" "}
-                    <button
-                      type="button"
-                      className="suggest-link"
-                      onClick={() => {
-                        onEmailChange(emailIssue.suggestion!);
-                        setEmailBlurred(false);
-                      }}
-                    >
-                      {emailIssue.suggestion}
-                    </button>
-                    ?
-                  </>
-                )}
-              </div>
-            )}
+            <div id="na-email-status" role="status" aria-live="polite">
+              {emailState === "checking" && (
+                <div className="field-note checking">Checking address…</div>
+              )}
+
+              {emailState === "invalid" && emailMessage && (
+                <div className="field-note error">{emailMessage}</div>
+              )}
+
+              {emailState === "valid" && !suggestion && (
+                <div className="field-note ok">Address looks good</div>
+              )}
+
+              {suggestion && (
+                <div className="field-note error">
+                  Did you mean{" "}
+                  <button
+                    type="button"
+                    className="suggest-link"
+                    onClick={() => onEmailChange(suggestion)}
+                  >
+                    {suggestion}
+                  </button>
+                  ?
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="form-group">
@@ -582,7 +644,7 @@ export default function NeuralAccessLogin({
             <button
               type="submit"
               className="btn-base"
-              disabled={loading || Boolean(emailIssue.error)}
+              disabled={loading || (mode === "register" && emailState === "invalid")}
             >
               {submitLabel}
             </button>

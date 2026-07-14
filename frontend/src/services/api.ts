@@ -74,6 +74,28 @@ export async function resendVerification(email: string): Promise<void> {
   await api.post("/auth/resend-verification", { email });
 }
 
+export interface EmailCheck {
+  valid: boolean;
+  detail?: string | null;
+}
+
+/**
+ * Does this address actually exist? The server does a real DNS/MX lookup — the same
+ * one signup performs — so a dead domain is caught while typing instead of after a
+ * failed submit. It never reveals whether the address is already registered.
+ */
+export async function checkEmail(
+  email: string,
+  signal?: AbortSignal
+): Promise<EmailCheck> {
+  const { data } = await api.post<EmailCheck>(
+    "/auth/check-email",
+    { email },
+    { signal }
+  );
+  return data;
+}
+
 export async function login(email: string, password: string): Promise<AuthToken> {
   const { data } = await api.post<AuthToken>("/auth/login", { email, password });
   return data;

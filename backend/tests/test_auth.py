@@ -70,3 +70,46 @@ def test_a_verification_token_is_not_usable_as_an_api_credential(client, auth):
     from app.security import decode_verification_token
 
     assert decode_verification_token(create_access_token(1)) is None
+
+
+# ── Live email check (used by the signup form as you type) ───────────────────
+
+
+def test_check_email_accepts_a_real_address(client, monkeypatch):
+    # Deliverability is off in the test env (it needs DNS), so this exercises the
+    # syntax path; the MX path is covered by test_check_email_rejects_a_bad_domain.
+    r = client.post("/auth/check-email", json={"email": "prof@gmail.com"})
+    assert r.status_code == 200
+    assert r.json()["valid"] is True
+
+
+def test_check_email_rejects_a_malformed_address(client):
+    r = client.post("/auth/check-email", json={"email": "not-an-email"})
+    assert r.status_code == 200  # a verdict, not an error
+    body = r.json()
+    assert body["valid"] is False
+    assert body["detail"]
+
+
+def test_check_email_rejects_a_bad_domain(client, monkeypatch):
+    """The whole point: a syntactically fine address whose domain cannot receive mail."""
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "check_email_deliverability", True)
+    r = client.post(
+        "/auth/check-email", json={"email": "prof@thisdomaindoesnotexist99xyz.com"}
+    )
+    assert r.json()["valid"] is False
+    assert "does not exist" in r.json()["detail"].lower()
+
+
+def test_check_email_does_not_reveal_whether_an_account_exists(client, auth):
+    """It must not become an account-enumeration oracle.
+
+    A registered address and an unregistered one must be indistinguishable — the
+    endpoint reports deliverability only.
+    """
+    registered = client.get("/auth/me", headers=auth).json()["email"]
+    a = client.post("/auth/check-email", json={"email": registered}).json()
+    b = client.post("/auth/check-email", json={"email": "nobody-here@gmail.com"}).json()
+    assert a == b
