@@ -133,6 +133,19 @@ class QuizOut(BaseModel):
     config: dict
     created_at: datetime
     questions: list[QuestionPublic]
+    share_token: str
+
+
+class PublicQuizOut(BaseModel):
+    """A quiz as a student sees it: no ids, no answer key, no owner information."""
+
+    title: str
+    questions: list[QuestionPublic]
+
+
+class StudentSubmitRequest(BaseModel):
+    student_name: str = Field(min_length=1, max_length=255)
+    answers: dict[int, str]
 
 
 class QuizSummary(BaseModel):

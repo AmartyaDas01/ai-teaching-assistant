@@ -1,4 +1,4 @@
-import { AlertCircle, Download, RotateCcw } from "lucide-react";
+import { AlertCircle, Check, Copy, Download, RotateCcw, Share2 } from "lucide-react";
 import { useState } from "react";
 import QuizConfig from "../components/Quiz/QuizConfig";
 import QuizQuestion from "../components/Quiz/QuizQuestion";
@@ -6,6 +6,7 @@ import Navbar from "../components/layout/Navbar";
 import {
   generateQuiz,
   quizExportUrl,
+  quizShareUrl,
   submitQuiz,
 } from "../services/api";
 import type { AttemptResult, Quiz as QuizType, QuizGenerateRequest } from "../types";
@@ -99,6 +100,7 @@ export default function Quiz() {
 
         {mode === "taking" && quiz && (
           <div className="mx-auto max-w-2xl space-y-4">
+            <ShareLink shareToken={quiz.share_token} />
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold text-slate-100">{quiz.title}</h2>
               <span className="text-xs text-muted">
@@ -149,6 +151,54 @@ export default function Quiz() {
         )}
       </div>
     </>
+  );
+}
+
+/**
+ * The link a professor sends to students. This is what turns the analytics from a
+ * demo into something real: without it, the only person who can take a quiz is the
+ * professor who made it.
+ */
+function ShareLink({ shareToken }: { shareToken: string }) {
+  const [copied, setCopied] = useState(false);
+  const url = quizShareUrl(shareToken);
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      return; // clipboard blocked (insecure context) — the link is visible anyway
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-surface p-4 shadow-card">
+      <div className="flex items-center gap-2">
+        <Share2 className="h-4 w-4 shrink-0 text-slate-400" />
+        <span className="text-sm font-semibold text-slate-100">Share with students</span>
+      </div>
+      <p className="mt-1 text-xs text-muted">
+        Anyone with this link can take the quiz — no account needed. Their scores feed
+        your analytics.
+      </p>
+      <div className="mt-3 flex gap-2">
+        <input
+          readOnly
+          value={url}
+          onFocus={(e) => e.currentTarget.select()}
+          className="min-w-0 flex-1 truncate rounded-lg border border-white/10 bg-surface-2 px-3 py-2 text-xs text-slate-300 outline-none"
+        />
+        <button
+          onClick={copy}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-fg transition-colors hover:bg-primary-hover"
+        >
+          {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
+    </div>
   );
 }
 

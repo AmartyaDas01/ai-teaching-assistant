@@ -23,6 +23,7 @@ from app.api.routes import (
     chat,
     courses,
     documents,
+    public,
     quiz,
     settings as settings_routes,
 )
@@ -100,6 +101,7 @@ app.include_router(documents.router)
 app.include_router(chat.router)
 app.include_router(quiz.router)
 app.include_router(analytics.router)
+app.include_router(public.router)
 app.include_router(settings_routes.router)
 
 

@@ -6,6 +6,7 @@ import Documents from "./pages/Documents";
 import Login from "./pages/Login";
 import Quiz from "./pages/Quiz";
 import Settings from "./pages/Settings";
+import TakeQuiz from "./pages/TakeQuiz";
 import Verify from "./pages/Verify";
 import { useAppStore } from "./store/useAppStore";
 
@@ -22,6 +23,12 @@ export default function App() {
     window.addEventListener("auth:unauthorized", handler);
     return () => window.removeEventListener("auth:unauthorized", handler);
   }, [logout]);
+
+  // The student quiz link is public: it must render whether or not anyone is signed
+  // in, and it must NOT be swallowed by the login screen or the app shell. A student
+  // has no account, and a signed-in professor opening the link should still see it.
+  const takeMatch = window.location.pathname.match(/^\/take\/([\w-]+)$/);
+  if (takeMatch) return <TakeQuiz shareToken={takeMatch[1]} />;
 
   if (!token) {
     // The emailed confirmation link lands here while signed out, so it must resolve

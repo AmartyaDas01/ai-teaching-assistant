@@ -94,6 +94,14 @@ export interface Quiz {
   };
   created_at: string;
   questions: QuizQuestion[];
+  /** Public handle for the student link: /take/<share_token>. */
+  share_token: string;
+}
+
+/** A quiz as a student sees it — no ids, no answer key. */
+export interface PublicQuiz {
+  title: string;
+  questions: QuizQuestion[];
 }
 
 export interface QuizSummary {

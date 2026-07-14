@@ -40,6 +40,7 @@ def _to_quiz_out(quiz: Quiz) -> QuizOut:
         document_id=quiz.document_id,
         config=quiz.config_json,
         created_at=quiz.created_at,
+        share_token=quiz.share_token,
         questions=[
             QuestionPublic(
                 id=q.id,

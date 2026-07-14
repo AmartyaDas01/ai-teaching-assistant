@@ -56,23 +56,52 @@ def ensure_schema() -> None:
     than being locked out of their own app.
     """
     inspector = inspect(engine)
-    if "users" not in inspector.get_table_names():
-        return  # fresh DB: create_all already made the column
-
-    columns = {c["name"] for c in inspector.get_columns("users")}
-    if "is_verified" in columns:
-        return
-
+    tables = inspector.get_table_names()
     is_sqlite = settings.database_url.startswith("sqlite")
-    default_true = "1" if is_sqlite else "TRUE"
-    with engine.begin() as conn:
-        conn.execute(
-            text(
-                f"ALTER TABLE users ADD COLUMN is_verified BOOLEAN "
-                f"NOT NULL DEFAULT {default_true}"
+
+    # users.is_verified — accounts that predate email verification are backfilled as
+    # verified rather than being locked out of their own app.
+    if "users" in tables:
+        columns = {c["name"] for c in inspector.get_columns("users")}
+        if "is_verified" not in columns:
+            default_true = "1" if is_sqlite else "TRUE"
+            with engine.begin() as conn:
+                conn.execute(
+                    text(
+                        f"ALTER TABLE users ADD COLUMN is_verified BOOLEAN "
+                        f"NOT NULL DEFAULT {default_true}"
+                    )
+                )
+            logger.info(
+                "Added users.is_verified; existing accounts backfilled as verified."
             )
-        )
-    logger.info("Added users.is_verified; existing accounts backfilled as verified.")
+
+    # quizzes.share_token — the public student link. Existing quizzes need a token
+    # each; the column is added nullable, backfilled per-row, then made unique.
+    if "quizzes" in tables:
+        columns = {c["name"] for c in inspector.get_columns("quizzes")}
+        if "share_token" not in columns:
+            from app.models.quiz import new_share_token
+
+            with engine.begin() as conn:
+                conn.execute(
+                    text("ALTER TABLE quizzes ADD COLUMN share_token VARCHAR(64)")
+                )
+                ids = [r[0] for r in conn.execute(text("SELECT id FROM quizzes"))]
+                for quiz_id in ids:
+                    conn.execute(
+                        text("UPDATE quizzes SET share_token = :t WHERE id = :i"),
+                        {"t": new_share_token(), "i": quiz_id},
+                    )
+                conn.execute(
+                    text(
+                        "CREATE UNIQUE INDEX IF NOT EXISTS ix_quizzes_share_token "
+                        "ON quizzes (share_token)"
+                    )
+                )
+            logger.info(
+                "Added quizzes.share_token; backfilled %d existing quizzes.", len(ids)
+            )
 
 
 def init_db() -> None:

@@ -9,6 +9,7 @@ import type {
   LLMSettings,
   Quiz,
   QuizGenerateRequest,
+  PublicQuiz,
   QuizSummary,
   RegisterResponse,
   User,
@@ -199,6 +200,30 @@ export async function deleteQuiz(id: number): Promise<void> {
 
 export function quizExportUrl(id: number): string {
   return `${baseURL}/quiz/${id}/export`;
+}
+
+// ─── Public (student) — no account, no auth header ───────────────
+
+/** Build the link a professor hands to students. */
+export function quizShareUrl(shareToken: string): string {
+  return `${window.location.origin}/take/${shareToken}`;
+}
+
+export async function getSharedQuiz(shareToken: string): Promise<PublicQuiz> {
+  const { data } = await api.get<PublicQuiz>(`/public/quiz/${shareToken}`);
+  return data;
+}
+
+export async function submitSharedQuiz(
+  shareToken: string,
+  studentName: string,
+  answers: Record<number, string>
+): Promise<AttemptResult> {
+  const { data } = await api.post<AttemptResult>(
+    `/public/quiz/${shareToken}/submit`,
+    { student_name: studentName, answers }
+  );
+  return data;
 }
 
 // ─── Analytics ───────────────────────────────────────────────────

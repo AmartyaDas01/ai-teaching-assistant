@@ -3,12 +3,18 @@
 Follows the brief's schema. options_json / config_json / answers_json use SQLAlchemy's
 JSON type (Postgres-compatible; stored as TEXT on SQLite).
 """
+import secrets
 from datetime import datetime
 
 from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
+
+
+def new_share_token() -> str:
+    """Unguessable handle for the public student link (URL-safe, ~128 bits)."""
+    return secrets.token_urlsafe(16)
 
 
 class Quiz(Base):
@@ -22,6 +28,12 @@ class Quiz(Base):
         ForeignKey("courses.id", ondelete="CASCADE"), nullable=False
     )
     title: Mapped[str] = mapped_column(String(512), nullable=False)
+    # Students take a quiz via /take/<share_token> with no account. The token is the
+    # only credential, so it must be unguessable — quiz ids are sequential and would
+    # let anyone enumerate every quiz in the system.
+    share_token: Mapped[str] = mapped_column(
+        String(64), unique=True, index=True, default=new_share_token, nullable=False
+    )
     # generation config: {num_questions, difficulty, bloom_levels, source_filename}
     config_json: Mapped[dict] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(
