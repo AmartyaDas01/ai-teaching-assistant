@@ -1,0 +1,92 @@
+{
+  "document": "lecture_sorting.md",
+  "notes": "Reference set for the RAG pipeline. `evidence` lists strings that must appear in a retrieved chunk for that chunk to count as relevant — this is what makes retrieval measurable without hand-labelling chunk ids (chunk boundaries change whenever the chunker is retuned). `unanswerable` questions have no support in the document and exist to measure refusal: a grounded system must decline rather than invent an answer.",
+  "questions": [
+    {
+      "id": "q1",
+      "question": "What is the worst-case time complexity of insertion sort, and when does it occur?",
+      "evidence": ["worst-case time complexity is O(n^2)", "reverse order"],
+      "reference_answer": "O(n^2), which occurs when the input is sorted in reverse order, because every new element must travel the full length of the sorted prefix.",
+      "bloom": "L1"
+    },
+    {
+      "id": "q2",
+      "question": "How much auxiliary space does merge sort need?",
+      "evidence": ["O(n) auxiliary space"],
+      "reference_answer": "O(n) auxiliary space for the merge buffer, so it is not in-place.",
+      "bloom": "L1"
+    },
+    {
+      "id": "q3",
+      "question": "Why can counting sort be faster than O(n log n) when that is supposed to be a lower bound?",
+      "evidence": ["comparison-based", "never compares two elements", "O(n + k)"],
+      "reference_answer": "The Omega(n log n) lower bound applies only to comparison-based algorithms. Counting sort never compares elements — it uses keys as array indices — so the bound does not apply. It runs in O(n + k).",
+      "bloom": "L2"
+    },
+    {
+      "id": "q4",
+      "question": "Explain why quicksort can degrade to O(n^2).",
+      "evidence": ["smallest or largest element", "unbalanced", "quicksort degrades to O(n^2)"],
+      "reference_answer": "If the pivot is always the smallest or largest element (for example, already-sorted input with a first-element pivot), the partitions are maximally unbalanced and the recursion depth becomes n, giving O(n^2).",
+      "bloom": "L2"
+    },
+    {
+      "id": "q5",
+      "question": "I need to sort records by multiple keys in sequence. Which algorithm should I use and why?",
+      "evidence": ["stable", "sorting records by multiple keys"],
+      "reference_answer": "Merge sort, because it is stable — it preserves the relative order of equal elements, which is required when sorting by successive keys. Quicksort is not stable.",
+      "bloom": "L3"
+    },
+    {
+      "id": "q6",
+      "question": "For a real-time system that needs worst-case guarantees, which sorting algorithm is appropriate?",
+      "evidence": ["worst-case guarantees", "merge sort", "heapsort"],
+      "reference_answer": "Merge sort or heapsort, both of which are O(n log n) in the worst case. Quicksort's O(n^2) worst case makes it unsuitable when guarantees are required.",
+      "bloom": "L3"
+    },
+    {
+      "id": "q7",
+      "question": "Compare quicksort and merge sort in terms of memory and practical speed.",
+      "evidence": ["in place", "cache locality", "O(n) auxiliary space"],
+      "reference_answer": "Quicksort sorts in place (O(log n) stack) and has good cache locality, making it typically faster in practice. Merge sort needs O(n) auxiliary space but guarantees O(n log n) in all cases and is stable.",
+      "bloom": "L4"
+    },
+    {
+      "id": "q8",
+      "question": "Why do real-world library sorts like Timsort and Introsort combine several algorithms?",
+      "evidence": ["Timsort", "Introsort", "hybrids"],
+      "reference_answer": "To exploit each algorithm's strengths while covering its weaknesses. Timsort is a stable merge sort that detects sorted runs and uses insertion sort on short ones. Introsort starts with quicksort for speed and switches to heapsort past a recursion-depth threshold to guarantee O(n log n).",
+      "bloom": "L4"
+    },
+    {
+      "id": "q9",
+      "question": "Why is the comparison-based lower bound Omega(n log n)?",
+      "evidence": ["decision tree", "n! possible permutations", "log2(n!)"],
+      "reference_answer": "A comparison-based algorithm is a decision tree whose leaves are the n! permutations. A binary tree with n! leaves has height at least log2(n!), which is Theta(n log n).",
+      "bloom": "L2"
+    },
+    {
+      "id": "q10",
+      "question": "Which sorting algorithm is best for small or nearly-sorted inputs?",
+      "evidence": ["insertion sort", "nearly-sorted"],
+      "reference_answer": "Insertion sort. Its best case is O(n) on already-sorted input, which is why library sorts switch to it for small subarrays.",
+      "bloom": "L1"
+    },
+    {
+      "id": "q11",
+      "question": "What is the time complexity of Dijkstra's shortest path algorithm?",
+      "evidence": [],
+      "reference_answer": "The document does not cover Dijkstra's algorithm.",
+      "unanswerable": true,
+      "bloom": "L1"
+    },
+    {
+      "id": "q12",
+      "question": "What grading policy applies to the final exam in this course?",
+      "evidence": [],
+      "reference_answer": "The document says nothing about grading policy.",
+      "unanswerable": true,
+      "bloom": "L1"
+    }
+  ]
+}

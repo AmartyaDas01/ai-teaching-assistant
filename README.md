@@ -89,6 +89,34 @@ repairs the output before persisting.
 
 ---
 
+## Evaluation
+
+The RAG pipeline is measured, not assumed. [`backend/eval`](./backend/eval) runs the real
+stack — same chunker, embeddings, vector store and prompt — against a labelled reference
+set, scoring retrieval and generation separately (they fail differently, and one score
+hides which broke).
+
+`all-MiniLM-L6-v2` · ChromaDB · 500/50 chunking · k=5 · GPT-4o:
+
+| Retrieval | | Generation | |
+|---|---|---|---|
+| hit@1 | 0.70 | correctness | 1.00 |
+| hit@3 | **1.00** | groundedness | **0.90** |
+| MRR | 0.83 | refusal (unanswerable) | **1.00** |
+| context recall | 0.90 | | |
+
+The reference set includes deliberately **unanswerable** questions: a teaching assistant
+that won't say *"I don't know"* will eventually invent an answer for a student, so refusal
+is measured explicitly. Groundedness is scored apart from correctness for the same reason —
+an answer can be *right yet ungrounded*, where the model recites a fact from pre-training
+that the retrieved context never supported. Exactly one question does that, and it is the
+one where retrieval surfaced only half the required evidence.
+
+```bash
+cd backend && python -m eval.run_eval              # full
+cd backend && python -m eval.run_eval --retrieval-only  # no LLM cost
+```
+
 ## Quickstart (local)
 
 Requires Python 3.12 and Node 18+.
