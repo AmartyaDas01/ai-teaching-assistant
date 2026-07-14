@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  backend:
+    name: Backend — tests + RAG eval
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # The embedding model is ~90MB; without this every run re-downloads it.
+      - name: Cache the sentence-transformers model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-all-MiniLM-L6-v2
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run tests
+        working-directory: backend
+        run: pytest
+
+      # Retrieval-only: no LLM calls, so CI needs no API key and costs nothing.
+      # Exits non-zero if hit@k collapses, which catches a regression in chunking,
+      # the embedding model, or the vector store that the unit tests would not.
+      - name: RAG evaluation (retrieval)
+        working-directory: backend
+        run: python -m eval.run_eval --retrieval-only
+
+  frontend:
+    name: Frontend — typecheck + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
