@@ -119,6 +119,41 @@ def _retrieve(question: str, collection_names: list[str]) -> list[dict]:
     return merged[:TOP_K]
 
 
+def retrieve_for(question: str, collection_names: list[str]) -> list[dict]:
+    """Public entry to retrieval, for callers that stream the generation themselves."""
+    return _retrieve(question, collection_names)
+
+
+def stream_answer(question: str, chunks: list[dict]):
+    """Yield the answer token by token.
+
+    The retrieval step is *not* streamed — it has to finish before the prompt can be
+    built — so the caller sends the citations first and then streams the prose. That
+    ordering matters: a student sees which sources are being used before the answer
+    appears, rather than reading an unattributed wall of text and finding out after.
+    """
+    context = _build_context(chunks)
+    user_prompt = (
+        f"Course excerpts:\n\n{context}\n\n"
+        f"Question: {question}\n\n"
+        "Answer using only the excerpts above."
+    )
+    try:
+        llm = get_llm()
+        for piece in llm.stream(
+            [("system", SYSTEM_PROMPT), ("human", user_prompt)]
+        ):
+            text = piece.content if hasattr(piece, "content") else str(piece)
+            if text:
+                yield text
+    except Exception as exc:  # noqa: BLE001
+        raise LLMUnavailableError(
+            "Could not reach the language model. Set OPENAI_API_KEY in .env, or start "
+            f"Ollama (ollama pull {settings.ollama_model}) and try again. "
+            f"Underlying error: {exc}"
+        ) from exc
+
+
 def answer_query(question: str, collection_names: list[str]) -> ChatResponse:
     """Retrieve, generate a grounded answer, and return it with source citations."""
     chunks = _retrieve(question, collection_names)

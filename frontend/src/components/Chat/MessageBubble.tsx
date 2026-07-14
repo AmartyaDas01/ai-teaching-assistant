@@ -24,7 +24,15 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
               : "border border-border bg-surface text-foreground shadow-card"
         }`}
       >
-        <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+        <p className="whitespace-pre-wrap leading-relaxed">
+          {message.content}
+          {message.streaming && (
+            <span
+              aria-hidden
+              className="ml-0.5 inline-block h-[1em] w-[2px] animate-pulse bg-current align-text-bottom"
+            />
+          )}
+        </p>
         {!isUser && message.sources && (
           <SourceCitation sources={message.sources} />
         )}

@@ -12,6 +12,7 @@ import type {
   PublicQuiz,
   QuizSummary,
   RegisterResponse,
+  Source,
   User,
 } from "../types";
 
@@ -163,6 +164,71 @@ export async function queryChat(
     course_id: courseId,
   });
   return data;
+}
+
+export interface StreamHandlers {
+  onSources: (sources: Source[], provider: string) => void;
+  onToken: (text: string) => void;
+  onError: (detail: string) => void;
+}
+
+/**
+ * Streaming chat. Uses fetch rather than axios because XHR can't expose a response
+ * body incrementally in the browser — axios would only resolve once the whole answer
+ * had arrived, which defeats the purpose.
+ *
+ * The server sends citations first, then the answer token by token.
+ */
+export async function streamChat(
+  question: string,
+  courseId: number | undefined,
+  handlers: StreamHandlers,
+  signal?: AbortSignal
+): Promise<void> {
+  const res = await fetch(`${baseURL}/chat/stream`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    },
+    body: JSON.stringify({ question, course_id: courseId }),
+    signal,
+  });
+
+  if (!res.ok || !res.body) {
+    let detail = "Something went wrong reaching the backend.";
+    try {
+      detail = (await res.json())?.detail ?? detail;
+    } catch {
+      /* non-JSON error body */
+    }
+    handlers.onError(detail);
+    return;
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    // SSE frames are separated by a blank line. A frame can arrive split across
+    // chunks, so anything after the last separator stays buffered for next time.
+    const frames = buffer.split("\n\n");
+    buffer = frames.pop() ?? "";
+
+    for (const frame of frames) {
+      const line = frame.split("\n").find((l) => l.startsWith("data: "));
+      if (!line) continue;
+      const event = JSON.parse(line.slice(6));
+      if (event.type === "sources") handlers.onSources(event.sources, event.provider);
+      else if (event.type === "token") handlers.onToken(event.text);
+      else if (event.type === "error") handlers.onError(event.detail);
+    }
+  }
 }
 
 // ─── Quiz ────────────────────────────────────────────────────────

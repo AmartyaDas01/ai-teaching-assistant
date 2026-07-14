@@ -30,6 +30,12 @@ export default function ChatWindow({ messages, loading, onSend }: ChatWindowProp
     setInput("");
   }
 
+  // The assistant bubble is created empty and filled as tokens stream in, so the
+  // "searching" indicator belongs only to the gap before the first token.
+  const last = messages[messages.length - 1];
+  const waitingForFirstToken =
+    loading && last?.role === "assistant" && !last.content;
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="scroll-slim flex-1 space-y-5 overflow-y-auto p-4 sm:p-6">
@@ -63,14 +69,16 @@ export default function ChatWindow({ messages, loading, onSend }: ChatWindowProp
           <MessageBubble key={i} message={m} />
         ))}
 
-        {loading && (
+        {/* Only until the first token lands — after that the answer itself is the
+            progress indicator, and showing both would be noise. */}
+        {waitingForFirstToken && (
           <div className="flex items-center gap-2 pl-11 text-sm text-muted">
             <span className="flex gap-1">
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-500 [animation-delay:-0.3s]" />
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-500 [animation-delay:-0.15s]" />
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-500" />
             </span>
-            Thinking…
+            Searching your documents…
           </div>
         )}
         <div ref={bottomRef} />

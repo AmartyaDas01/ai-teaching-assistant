@@ -68,6 +68,8 @@ export interface ChatMessage {
   sources?: Source[];
   provider?: string;
   error?: boolean;
+  /** True while tokens are still arriving for this message. */
+  streaming?: boolean;
 }
 
 // ─── Quiz ────────────────────────────────────────────────────────
