@@ -58,26 +58,46 @@ class Settings(BaseSettings):
     # CORS
     frontend_origin: str = "http://localhost:5173"
 
-    # Email (signup verification). Gmail: use an App Password, not your login
-    # password (requires 2-Step Verification to be on).
+    # ── Email (signup verification) ──────────────────────────────────
+    # Two transports. Brevo is an HTTPS API and is what production uses: hosts like
+    # Render block outbound SMTP ports (25/465/587) to prevent spam, so SMTP fails
+    # there with "Network is unreachable" no matter how correct the credentials are.
+    # SMTP is kept for local use and for hosts that don't block it.
+    brevo_api_key: str = ""
+    email_from: str = ""  # the sender address verified with Brevo
+
     smtp_host: str = "smtp.gmail.com"
     smtp_port: int = 587
     smtp_user: str = ""  # e.g. you@gmail.com
     smtp_password: str = ""  # 16-char Gmail App Password
     smtp_from_name: str = "AI Teaching Assistant"
+
     verification_token_expire_hours: int = 24
     # Reject addresses whose domain has no MX record (catches @gmial.con etc.).
     check_email_deliverability: bool = True
 
     @property
-    def email_enabled(self) -> bool:
-        """Verification is only enforced when SMTP is actually configured.
+    def email_from_address(self) -> str:
+        """Sender address — falls back to the SMTP user when EMAIL_FROM isn't set."""
+        return (self.email_from or self.smtp_user).strip()
 
-        Without credentials the app stays zero-config: signups are auto-verified so
-        local development and demos keep working instead of dead-ending on an email
-        that can never arrive.
-        """
+    @property
+    def brevo_enabled(self) -> bool:
+        return bool(self.brevo_api_key.strip() and self.email_from_address)
+
+    @property
+    def smtp_enabled(self) -> bool:
         return bool(self.smtp_user.strip() and self.smtp_password.strip())
+
+    @property
+    def email_enabled(self) -> bool:
+        """Verification is only enforced when a transport is actually configured.
+
+        With none, the app stays zero-config: signups are auto-verified, so local
+        development and demos keep working instead of dead-ending on a confirmation
+        email that could never arrive.
+        """
+        return self.brevo_enabled or self.smtp_enabled
 
     @property
     def use_openai(self) -> bool:

@@ -41,13 +41,14 @@ services:
         sync: false
       - key: JWT_SECRET_KEY
         generateValue: true
-      # Signup email verification. Leave SMTP_USER/SMTP_PASSWORD unset to disable it
-      # (signups are then auto-activated). Gmail needs an App Password, not the
-      # account password.
-      - key: SMTP_USER
+      # Signup email verification via Brevo's HTTPS API. SMTP is NOT usable here:
+      # Render blocks outbound SMTP ports (25/465/587), so smtplib fails with
+      # "Network is unreachable" no matter how valid the credentials are.
+      # Leave BREVO_API_KEY unset to disable verification (signups auto-activate).
+      - key: BREVO_API_KEY
         sync: false
-      - key: SMTP_PASSWORD
-        sync: false
+      - key: EMAIL_FROM
+        sync: false # the sender address verified in Brevo
       # Only a scratch dir for the uploaded file during parsing — safe to be ephemeral.
       - key: UPLOAD_DIR
         value: /tmp/uploads
