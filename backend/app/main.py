@@ -5,6 +5,15 @@ Registers CORS, routers, and creates DB tables on startup.
 import logging
 from contextlib import asynccontextmanager
 
+# Uvicorn only configures its own loggers, so the app's loggers fall back to Python's
+# "handler of last resort", which emits WARNING and above and drops INFO entirely.
+# That silently hid the useful lines — "Verification email sent to ... via brevo" —
+# leaving only failures visible. Give the root logger a real handler at INFO.
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s %(name)s: %(message)s",
+)
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
