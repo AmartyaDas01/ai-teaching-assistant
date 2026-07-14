@@ -21,9 +21,39 @@ from app.config import settings
 from app.db import init_db
 
 
+def _log_email_config() -> None:
+    """Say plainly, at boot, whether verification emails can actually be sent.
+
+    A half-configured mail setup otherwise fails silently: signups just quietly
+    auto-activate and no email is ever attempted, which looks like the feature is
+    broken rather than switched off.
+    """
+    if settings.brevo_enabled:
+        logging.info(
+            "Email: Brevo enabled (sender: %s)", settings.email_from_address
+        )
+    elif settings.smtp_enabled:
+        logging.warning(
+            "Email: using SMTP. Most PaaS hosts block outbound SMTP ports — if sends "
+            "fail with 'Network is unreachable', switch to BREVO_API_KEY."
+        )
+    elif settings.brevo_api_key.strip() and not settings.email_from_address:
+        logging.error(
+            "Email DISABLED: BREVO_API_KEY is set but EMAIL_FROM is not. Set EMAIL_FROM "
+            "to the sender address you verified in Brevo. Signups will auto-activate "
+            "until you do."
+        )
+    else:
+        logging.warning(
+            "Email DISABLED: no BREVO_API_KEY or SMTP credentials. Signups will "
+            "auto-activate without verification."
+        )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    _log_email_config()
     yield
 
 
