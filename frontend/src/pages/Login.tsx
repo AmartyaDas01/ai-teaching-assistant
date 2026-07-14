@@ -81,6 +81,13 @@ export default function Login() {
         setMode(mode === "login" ? "register" : "login");
         setError(null);
         setNeedsVerify(false);
+        // Switching between signing in and signing up is a change of intent, so the
+        // credential shouldn't carry over: a password typed to log in would otherwise
+        // sit silently pre-filled in the signup form (and vice versa), which is both
+        // confusing and a poor thing to leave lying in a field the user didn't fill.
+        // Email is kept — it's the one value that's still relevant either way.
+        setPassword("");
+        setName("");
       }}
     />
   );

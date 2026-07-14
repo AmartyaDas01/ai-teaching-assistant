@@ -1,6 +1,39 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { resendVerification } from "../../services/api";
 
+// Practical rather than RFC-exhaustive: the backend does the authoritative check
+// (including an MX lookup). This exists to catch a typo before a round trip.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+/** Domains people fat-finger constantly. The backend's MX check rejects these, but
+ *  only after submitting — catching them here turns a failed signup into one click. */
+const TYPO_DOMAINS: Record<string, string> = {
+  "gmial.com": "gmail.com",
+  "gmai.com": "gmail.com",
+  "gnail.com": "gmail.com",
+  "gmail.co": "gmail.com",
+  "gmail.con": "gmail.com",
+  "gmaill.com": "gmail.com",
+  "yahooo.com": "yahoo.com",
+  "yaho.com": "yahoo.com",
+  "hotmial.com": "hotmail.com",
+  "hotmai.com": "hotmail.com",
+  "outlok.com": "outlook.com",
+  "outloook.com": "outlook.com",
+};
+
+function inspectEmail(value: string): { error?: string; suggestion?: string } {
+  const v = value.trim();
+  if (!v) return {};
+  if (!EMAIL_RE.test(v)) {
+    return { error: "That doesn't look like a valid email address." };
+  }
+  const domain = v.split("@")[1]?.toLowerCase();
+  const fixed = TYPO_DOMAINS[domain];
+  if (fixed) return { suggestion: v.replace(/@[^@]*$/, `@${fixed}`) };
+  return {};
+}
+
 export interface NeuralAccessLoginProps {
   mode: "login" | "register";
   name: string;
@@ -38,6 +71,21 @@ export default function NeuralAccessLogin({
   onToggleMode,
 }: NeuralAccessLoginProps) {
   const [resent, setResent] = useState(false);
+  // Don't scold someone mid-keystroke: "a@" is not yet a mistake. The warning appears
+  // once they pause typing, or as soon as they leave the field.
+  const [emailBlurred, setEmailBlurred] = useState(false);
+  const [emailSettled, setEmailSettled] = useState(false);
+
+  useEffect(() => {
+    setEmailSettled(false);
+    if (!email) return;
+    const t = setTimeout(() => setEmailSettled(true), 700);
+    return () => clearTimeout(t);
+  }, [email]);
+
+  const emailIssue = inspectEmail(email);
+  const showEmailIssue =
+    (emailBlurred || emailSettled) && (emailIssue.error || emailIssue.suggestion);
   // Generate static random blob values once per mount to keep positions stable.
   const blobsData = useMemo(
     () =>
@@ -224,6 +272,28 @@ export default function NeuralAccessLogin({
 
         .mercury-wrapper .form-group input:focus ~ .input-glow {
           width: 100%;
+        }
+
+        /* Inline field warning. Flows in normal document order rather than being
+           absolutely positioned: at 30px field spacing an absolute note would collide
+           with the next label on a two-line message. */
+        .mercury-wrapper .field-note {
+          margin-top: 8px;
+          font-family: 'Space Mono', monospace;
+          font-size: 11px;
+          line-height: 1.4;
+          color: #ffb86b;
+        }
+
+        .mercury-wrapper .suggest-link {
+          background: none;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          font-family: inherit;
+          font-size: 11px;
+          color: var(--accent);
+          text-decoration: underline;
         }
 
         .mercury-wrapper .auth-error {
@@ -423,7 +493,7 @@ export default function NeuralAccessLogin({
                 id="na-name"
                 type="text"
                 autoComplete="name"
-                placeholder="Prof. Amartya Das"
+                placeholder="Your full name"
                 value={name}
                 onChange={(e) => onNameChange(e.target.value)}
                 required
@@ -441,9 +511,35 @@ export default function NeuralAccessLogin({
               placeholder="you@university.edu"
               value={email}
               onChange={(e) => onEmailChange(e.target.value)}
+              onBlur={() => setEmailBlurred(true)}
+              aria-invalid={Boolean(emailIssue.error)}
+              aria-describedby={showEmailIssue ? "na-email-issue" : undefined}
               required
             />
             <div className="input-glow" />
+
+            {showEmailIssue && (
+              <div id="na-email-issue" className="field-note" role="status">
+                {emailIssue.error ? (
+                  emailIssue.error
+                ) : (
+                  <>
+                    Did you mean{" "}
+                    <button
+                      type="button"
+                      className="suggest-link"
+                      onClick={() => {
+                        onEmailChange(emailIssue.suggestion!);
+                        setEmailBlurred(false);
+                      }}
+                    >
+                      {emailIssue.suggestion}
+                    </button>
+                    ?
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="form-group">
@@ -481,7 +577,13 @@ export default function NeuralAccessLogin({
 
           <div className="submit-wrap">
             <div className="mercury-drop" />
-            <button type="submit" className="btn-base" disabled={loading}>
+            {/* A malformed address can't succeed, so don't spend a round trip on it.
+                A typo *suggestion* still submits — it might genuinely be their domain. */}
+            <button
+              type="submit"
+              className="btn-base"
+              disabled={loading || Boolean(emailIssue.error)}
+            >
               {submitLabel}
             </button>
           </div>
