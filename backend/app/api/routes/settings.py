@@ -1,4 +1,4 @@
-"""Settings endpoints — view/switch the active LLM provider at runtime."""
+"""Settings endpoints - view/switch the active LLM provider at runtime."""
 from fastapi import APIRouter, Depends
 
 from app.config import settings

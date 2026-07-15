@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 
 # Uvicorn only configures its own loggers, so the app's loggers fall back to Python's
 # "handler of last resort", which emits WARNING and above and drops INFO entirely.
-# That silently hid the useful lines — "Verification email sent to ... via brevo" —
+# That silently hid the useful lines - "Verification email sent to ... via brevo" -
 # leaving only failures visible. Give the root logger a real handler at INFO.
 logging.basicConfig(
     level=logging.INFO,
@@ -44,7 +44,7 @@ def _log_email_config() -> None:
         )
     elif settings.smtp_enabled:
         logging.warning(
-            "Email: using SMTP. Most PaaS hosts block outbound SMTP ports — if sends "
+            "Email: using SMTP. Most PaaS hosts block outbound SMTP ports - if sends "
             "fail with 'Network is unreachable', switch to BREVO_API_KEY."
         )
     elif settings.brevo_api_key.strip() and not settings.email_from_address:
@@ -70,7 +70,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="AI Teaching Assistant API",
     version="0.1.0",
-    description="Phase 1 — Core RAG: document ingestion + grounded chat with citations.",
+    description="Phase 1 - Core RAG: document ingestion + grounded chat with citations.",
     lifespan=lifespan,
 )
 
@@ -109,7 +109,7 @@ class _SuppressHealthAccessLogs(logging.Filter):
     """Drop access-log lines for /health.
 
     Render probes the health endpoint every few seconds, and an uptime pinger hits it
-    too. Left alone, those lines bury everything else — the logs become useless for
+    too. Left alone, those lines bury everything else - the logs become useless for
     finding the one message you actually need (an SMTP failure, a traceback).
     Only the access log is filtered; real errors still come through.
     """

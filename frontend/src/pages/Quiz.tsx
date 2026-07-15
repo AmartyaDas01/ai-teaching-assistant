@@ -167,7 +167,7 @@ function ShareLink({ shareToken }: { shareToken: string }) {
     try {
       await navigator.clipboard.writeText(url);
     } catch {
-      return; // clipboard blocked (insecure context) — the link is visible anyway
+      return; // clipboard blocked (insecure context) - the link is visible anyway
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -180,7 +180,7 @@ function ShareLink({ shareToken }: { shareToken: string }) {
         <span className="text-sm font-semibold text-slate-100">Share with students</span>
       </div>
       <p className="mt-1 text-xs text-muted">
-        Anyone with this link can take the quiz — no account needed. Their scores feed
+        Anyone with this link can take the quiz - no account needed. Their scores feed
         your analytics.
       </p>
       <div className="mt-3 flex gap-2">

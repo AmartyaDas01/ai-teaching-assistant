@@ -1,4 +1,4 @@
-"""Analytics aggregation — computed on the fly from quizzes, questions, and attempts.
+"""Analytics aggregation - computed on the fly from quizzes, questions, and attempts.
 
 No dedicated analytics table: everything is derived from stored quiz attempts, so
 metrics always reflect the latest data.

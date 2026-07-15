@@ -1,4 +1,4 @@
-"""Chat endpoints — grounded Q&A over the user's course documents."""
+"""Chat endpoints - grounded Q&A over the user's course documents."""
 import json
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -24,7 +24,7 @@ def _collections_for(payload: ChatQuery, db: Session, user: User) -> list[str]:
     """Resolve which vector collections this question may search.
 
     A named course must be one the user owns. With no course selected, retrieval fans
-    out across every collection they own — it must never fall back to guessing one,
+    out across every collection they own - it must never fall back to guessing one,
     which used to send the query to the wrong course's documents.
     """
     if payload.course_id:
@@ -65,8 +65,8 @@ def stream(
 ):
     """Same answer as /query, streamed token by token.
 
-    Retrieval can't be streamed — the prompt needs the full context before generation
-    starts — so the citations are sent first as one event, then the prose arrives in
+    Retrieval can't be streamed - the prompt needs the full context before generation
+    starts - so the citations are sent first as one event, then the prose arrives in
     pieces. Sending sources up front is deliberate: the reader sees which material is
     being used *before* the answer, rather than reading an unattributed wall of text
     and learning its provenance afterwards.

@@ -63,7 +63,7 @@ export default function Documents() {
       refresh();
     } catch (e: any) {
       if (e?.code === "ERR_CANCELED" || e?.name === "CanceledError") {
-        remove(item.id); // user cancelled — drop the card silently
+        remove(item.id); // user cancelled - drop the card silently
         return;
       }
       patch(item.id, {
@@ -77,7 +77,7 @@ export default function Documents() {
   function handleFiles(files: File[]) {
     if (!activeCourseId) {
       setError(
-        "Select a course in the sidebar before uploading — documents are stored per course."
+        "Select a course in the sidebar before uploading - documents are stored per course."
       );
       return;
     }
@@ -119,7 +119,7 @@ export default function Documents() {
         {!activeCourseId && (
           <div className="flex items-center gap-2 rounded-lg border border-amber-500/25 bg-amber-500/10 px-4 py-2.5 text-sm text-amber-300">
             <AlertCircle className="h-4 w-4 shrink-0" />
-            Select a course in the sidebar to upload into — documents are organized per
+            Select a course in the sidebar to upload into - documents are organized per
             course.
           </div>
         )}

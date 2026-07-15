@@ -72,7 +72,7 @@ export default function DropZone({ onFiles, disabled }: DropZoneProps) {
           {disabled ? "Uploading…" : "Upload course materials"}
         </p>
         <p className="mt-0.5 text-xs text-muted">
-          Drag &amp; drop or click — PDF, DOCX, PPTX, TXT
+          Drag &amp; drop or click - PDF, DOCX, PPTX, TXT
         </p>
       </div>
     </div>

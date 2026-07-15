@@ -8,12 +8,12 @@
    Matches the Neural Access login: monochrome, thin luminous borders,
    white primary actions on black, Inter body + Space Mono micro-labels. */
 :root {
-  --color-primary: #fafafa; /* near-white — primary CTA surface */
+  --color-primary: #fafafa; /* near-white - primary CTA surface */
   --color-primary-hover: #d4d4d4; /* mercury */
   --color-primary-soft: rgba(255, 255, 255, 0.06);
   --color-on-primary: #0a0a0a; /* dark text on the white button */
 
-  --color-accent: #34d399; /* emerald — reserved for "ready"/success status */
+  --color-accent: #34d399; /* emerald - reserved for "ready"/success status */
   --color-accent-soft: rgba(52, 211, 153, 0.12);
 
   --color-bg: #050505; /* app canvas */
@@ -76,7 +76,7 @@
 }
 
 @layer utilities {
-  /* Space Mono micro-label — echoes the login's field labels */
+  /* Space Mono micro-label - echoes the login's field labels */
   .label-mono {
     font-family: "Space Mono", ui-monospace, monospace;
     text-transform: uppercase;

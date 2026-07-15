@@ -1,13 +1,13 @@
-"""ChromaDB wrapper — one persistent collection per course.
+"""ChromaDB wrapper - one persistent collection per course.
 
 Embeddings come from the provider set by EMBEDDING_PROVIDER: "local"
 (sentence-transformers all-MiniLM-L6-v2, ~1GB RAM) or "openai" (API-based
-text-embedding-3-small, negligible local footprint — lets the backend run on a
+text-embedding-3-small, negligible local footprint - lets the backend run on a
 free 512MB tier). The provider is fixed per collection: the two produce different
 vector dimensions (384 vs 1536), so switching requires re-ingesting documents.
 
 The embedding function is built lazily on first use, so importing this module (and
-starting the API) stays fast — the local model isn't downloaded, and no OpenAI call
+starting the API) stays fast - the local model isn't downloaded, and no OpenAI call
 is made, until a document is ingested or a query is run.
 """
 from __future__ import annotations
@@ -43,7 +43,7 @@ def _get_embedding_fn() -> embedding_functions.EmbeddingFunction:
     global _embedding_fn
     if _embedding_fn is None:
         if settings.embedding_provider == "openai" and settings.openai_api_key.strip():
-            # API-based — no local model loaded, so runtime RAM stays tiny.
+            # API-based - no local model loaded, so runtime RAM stays tiny.
             _embedding_fn = embedding_functions.OpenAIEmbeddingFunction(
                 api_key=settings.openai_api_key,
                 model_name=settings.openai_embedding_model,
@@ -138,7 +138,7 @@ def delete_document(collection_name: str, doc_id: int) -> None:
         coll = _collection(collection_name)
         coll.delete(where={"doc_id": doc_id})
     except Exception:
-        # Collection may not exist (e.g. ingestion failed before any add) — nothing to do.
+        # Collection may not exist (e.g. ingestion failed before any add) - nothing to do.
         pass
 
 

@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     # crashing on older macOS). Leave unset to let Ollama use the GPU.
     ollama_num_gpu: int | None = None
 
-    # Embeddings — "local" (sentence-transformers, needs ~1GB RAM) or "openai"
+    # Embeddings - "local" (sentence-transformers, needs ~1GB RAM) or "openai"
     # (API-based, tiny/no local footprint so the backend fits a free tier).
     embedding_provider: str = "local"
     local_embedding_model: str = "all-MiniLM-L6-v2"
@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "sqlite:///./app.db"
 
-    # Vector store — "chroma" (local, on-disk) or "qdrant" (remote, survives
+    # Vector store - "chroma" (local, on-disk) or "qdrant" (remote, survives
     # restarts on hosts without a persistent disk).
     vector_store: str = "chroma"
     chroma_persist_dir: str = "./chroma_data"
@@ -78,7 +78,7 @@ class Settings(BaseSettings):
 
     @property
     def email_from_address(self) -> str:
-        """Sender address — falls back to the SMTP user when EMAIL_FROM isn't set."""
+        """Sender address - falls back to the SMTP user when EMAIL_FROM isn't set."""
         return (self.email_from or self.smtp_user).strip()
 
     @property

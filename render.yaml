@@ -1,15 +1,15 @@
-# Render Blueprint — free-tier deploy, fully persistent.
+# Render Blueprint - free-tier deploy, fully persistent.
 #
 # Everything runs on free plans, and nothing is lost on restart:
 #   - LLM + embeddings : OpenAI (OpenAI embeddings mean the local torch model never
 #                        loads, so the backend fits Render's free 512MB tier)
-#   - vectors          : Qdrant Cloud (free 1GB) — remote, so they survive the free
+#   - vectors          : Qdrant Cloud (free 1GB) - remote, so they survive the free
 #                        tier's lack of a persistent disk
-#   - Postgres         : Neon (free, permanent) — Render's free DB expires in ~90d
+#   - Postgres         : Neon (free, permanent) - Render's free DB expires in ~90d
 #
 # Set these three secrets in the Render dashboard: OPENAI_API_KEY, QDRANT_URL +
 # QDRANT_API_KEY, and DATABASE_URL (the Neon connection string).
-# Only /tmp/uploads is ephemeral — it just holds the uploaded file while it's being
+# Only /tmp/uploads is ephemeral - it just holds the uploaded file while it's being
 # parsed, and isn't needed once the chunks are embedded into Qdrant.
 
 services:
@@ -31,7 +31,7 @@ services:
       - key: LLM_PROVIDER
         value: openai
       - key: EMBEDDING_PROVIDER
-        value: openai # API embeddings — no local model, fits the free tier
+        value: openai # API embeddings - no local model, fits the free tier
       # Vectors live in Qdrant Cloud, so they survive restarts (no disk on free).
       - key: VECTOR_STORE
         value: qdrant
@@ -49,7 +49,7 @@ services:
         sync: false
       - key: EMAIL_FROM
         sync: false # the sender address verified in Brevo
-      # Only a scratch dir for the uploaded file during parsing — safe to be ephemeral.
+      # Only a scratch dir for the uploaded file during parsing - safe to be ephemeral.
       - key: UPLOAD_DIR
         value: /tmp/uploads
       # CORS: the backend also allows any *.onrender.com origin via regex (see
@@ -57,7 +57,7 @@ services:
       - key: FRONTEND_ORIGIN
         value: https://ai-ta-frontend.onrender.com
 
-  # Frontend — static site (Vite build served from Render's CDN).
+  # Frontend - static site (Vite build served from Render's CDN).
   - type: web
     name: ai-ta-frontend
     runtime: static
@@ -67,7 +67,7 @@ services:
     envVars:
       # Baked into the Vite build at build time.
       # NOTE: `fromService … property: host` resolves to the *service name* only
-      # (e.g. "ai-ta-backend-k7bj"), not the public hostname — which produced an
+      # (e.g. "ai-ta-backend-k7bj"), not the public hostname - which produced an
       # unresolvable baseURL. Set the public URL explicitly instead. If you rename
       # the backend service or use a custom domain, update this value.
       - key: VITE_API_URL
@@ -78,5 +78,5 @@ services:
         source: /*
         destination: /index.html
 
-# No `databases:` block on purpose — Render's free Postgres expires after ~90 days.
+# No `databases:` block on purpose - Render's free Postgres expires after ~90 days.
 # Postgres is Neon instead (free + permanent); paste its URL into DATABASE_URL.

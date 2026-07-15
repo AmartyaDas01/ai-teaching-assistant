@@ -1,7 +1,7 @@
 """Measure the RAG pipeline instead of assuming it works.
 
-Runs the *real* stack — the same chunker, embedding provider, vector store and prompt
-the app uses — against a labelled reference set, and reports:
+Runs the *real* stack - the same chunker, embedding provider, vector store and prompt
+the app uses - against a labelled reference set, and reports:
 
   Retrieval
     hit@k   did any retrieved chunk actually contain the evidence the answer needs?
@@ -13,13 +13,13 @@ the app uses — against a labelled reference set, and reports:
     refusal       on questions the document cannot answer, does it decline?
 
 Why these: retrieval and generation fail differently, and a single "does it look right"
-score hides which one broke. A low hit@k means the retriever never found the evidence —
+score hides which one broke. A low hit@k means the retriever never found the evidence -
 no prompt engineering will fix that. High hit@k with low groundedness means the model is
 ignoring the context it was given.
 
 Usage
   python -m eval.run_eval                  # full run (uses the configured LLM)
-  python -m eval.run_eval --retrieval-only # no LLM calls, no API cost — fine for CI
+  python -m eval.run_eval --retrieval-only # no LLM calls, no API cost - fine for CI
   python -m eval.run_eval --k 3
 """
 from __future__ import annotations
@@ -117,7 +117,7 @@ def chunk_is_relevant(chunk_text: str, evidence: list[str]) -> bool:
     Requiring *all* evidence in a single chunk was the obvious first definition and it
     is wrong: a comparison question ("quicksort vs merge sort") draws evidence from two
     different sections, which by construction land in different chunks. That rule scored
-    a perfect retrieval as a miss — it measured chunk boundaries, not the retriever.
+    a perfect retrieval as a miss - it measured chunk boundaries, not the retriever.
     Whether the full evidence was assembled is measured separately, by context recall
     over the union of retrieved chunks.
 
@@ -154,7 +154,7 @@ def main() -> int:
     ap.add_argument(
         "--retrieval-only",
         action="store_true",
-        help="skip LLM judging — no API cost, safe for CI",
+        help="skip LLM judging - no API cost, safe for CI",
     )
     args = ap.parse_args()
 
@@ -162,7 +162,7 @@ def main() -> int:
     questions = spec["questions"]
 
     n_chunks = ingest()
-    print(f"\nRAG evaluation — {spec['document']}")
+    print(f"\nRAG evaluation - {spec['document']}")
     print(
         f"  embeddings: {settings.embedding_provider} · vector store: "
         f"{settings.vector_store} · chunks: {n_chunks} · k={args.k}"
@@ -218,7 +218,7 @@ def main() -> int:
             row_grounded = "✓" if verdict.get("grounded") else "✗"
 
         rows.append(
-            (q["id"], q["bloom"], first or "—", f"{recall:.2f}", row_correct, row_grounded)
+            (q["id"], q["bloom"], first or "-", f"{recall:.2f}", row_correct, row_grounded)
         )
 
     # Refusal: a grounded system must decline when the document cannot answer.
@@ -264,7 +264,7 @@ def main() -> int:
     print(f"\n  {elapsed:.1f}s\n")
     store.delete_collection(COLLECTION)
 
-    # Non-zero exit if retrieval collapses — makes this usable as a CI gate.
+    # Non-zero exit if retrieval collapses - makes this usable as a CI gate.
     return 0 if hits[args.k] / n >= 0.7 else 1
 
 

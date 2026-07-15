@@ -6,7 +6,7 @@ import { checkEmail, resendVerification } from "../../services/api";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /** Domains people fat-finger constantly. The backend's MX check rejects these, but
- *  only after submitting — catching them here turns a failed signup into one click. */
+ *  only after submitting - catching them here turns a failed signup into one click. */
 const TYPO_DOMAINS: Record<string, string> = {
   "gmial.com": "gmail.com",
   "gmai.com": "gmail.com",
@@ -41,7 +41,7 @@ export interface NeuralAccessLoginProps {
   password: string;
   loading?: boolean;
   error?: string | null;
-  /** Set when login failed because the account is unverified — offers a resend link. */
+  /** Set when login failed because the account is unverified - offers a resend link. */
   resendEmail?: string;
   onNameChange: (v: string) => void;
   onEmailChange: (v: string) => void;
@@ -51,7 +51,7 @@ export interface NeuralAccessLoginProps {
 }
 
 /**
- * Liquid-mercury login surface. Presentational only — all auth state and the submit
+ * Liquid-mercury login surface. Presentational only - all auth state and the submit
  * handler are passed in as props so the page (Login.tsx) owns the real login/register
  * flow. Adapted from the "Neural Access" concept: dark gooey-blob background with a
  * mouse-parallax effect, monospace accents, and a mercury-drop submit button.
@@ -128,7 +128,7 @@ export default function NeuralAccessLogin({
    * network), and only a well-formed address is sent to the server, which does a real
    * DNS/MX lookup to prove the domain can actually receive mail.
    *
-   * The check waits for a pause in typing — validating every keystroke would mean a
+   * The check waits for a pause in typing - validating every keystroke would mean a
    * DNS lookup per character, and "a@" is not yet a mistake worth scolding.
    */
   const [emailState, setEmailState] = useState<
@@ -149,7 +149,7 @@ export default function NeuralAccessLogin({
 
     const local = inspectEmail(value);
     if (local.error) {
-      // Malformed — no point asking the server about it.
+      // Malformed - no point asking the server about it.
       setEmailState("invalid");
       setEmailMessage(local.error);
       return;
@@ -172,7 +172,7 @@ export default function NeuralAccessLogin({
         }
       } catch {
         // Offline or the request was superseded: never block signup on our own
-        // convenience check — the server validates again at submit anyway.
+        // convenience check - the server validates again at submit anyway.
         if (!controller.signal.aborted) setEmailState("idle");
       }
     }, 700);
@@ -674,7 +674,7 @@ export default function NeuralAccessLogin({
                 // "Address looks good" reports the domain check that passed; the second
                 // half sets the honest expectation, since no check can prove a specific
                 // Gmail/Outlook mailbox exists (providers accept-all to stop
-                // enumeration) — the confirmation link is the real proof.
+                // enumeration) - the confirmation link is the real proof.
                 <div className="field-note ok">
                   Address looks good, a confirmation link will be sent here
                 </div>
@@ -743,7 +743,7 @@ export default function NeuralAccessLogin({
           <div className="submit-wrap">
             <div className="mercury-drop" />
             {/* A malformed address can't succeed, so don't spend a round trip on it.
-                A typo *suggestion* still submits — it might genuinely be their domain. */}
+                A typo *suggestion* still submits - it might genuinely be their domain. */}
             <button
               type="submit"
               className="btn-base"

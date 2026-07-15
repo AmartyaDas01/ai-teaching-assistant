@@ -1,7 +1,7 @@
 """RAG pipeline: retrieve relevant chunks -> build grounded prompt -> LLM -> answer.
 
 The `get_llm()` factory returns ChatOpenAI when an OpenAI key is configured, otherwise
-ChatOllama (local). Switching providers requires no code changes — only .env.
+ChatOllama (local). Switching providers requires no code changes - only .env.
 """
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ TOP_K = 5
 SYSTEM_PROMPT = """You are a teaching assistant for a university CSE course. Answer the \
 student's question using ONLY the provided course excerpts. Ground every claim in the \
 excerpts. If the excerpts do not contain the answer, say you don't have enough \
-information in the uploaded materials — do not use outside knowledge or invent facts. \
+information in the uploaded materials - do not use outside knowledge or invent facts. \
 Be concise and clear, as if explaining to a student."""
 
 
@@ -83,7 +83,7 @@ def _build_context(chunks: list[dict]) -> str:
     for i, ch in enumerate(chunks, start=1):
         meta = ch["metadata"]
         blocks.append(
-            f"[Excerpt {i} — {meta['filename']}, page {meta['page_number']}]\n{ch['text']}"
+            f"[Excerpt {i} - {meta['filename']}, page {meta['page_number']}]\n{ch['text']}"
         )
     return "\n\n".join(blocks)
 
@@ -127,8 +127,8 @@ def retrieve_for(question: str, collection_names: list[str]) -> list[dict]:
 def stream_answer(question: str, chunks: list[dict]):
     """Yield the answer token by token.
 
-    The retrieval step is *not* streamed — it has to finish before the prompt can be
-    built — so the caller sends the citations first and then streams the prose. That
+    The retrieval step is *not* streamed - it has to finish before the prompt can be
+    built - so the caller sends the citations first and then streams the prose. That
     ordering matters: a student sees which sources are being used before the answer
     appears, rather than reading an unattributed wall of text and finding out after.
     """

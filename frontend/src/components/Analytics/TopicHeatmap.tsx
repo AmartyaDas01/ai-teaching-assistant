@@ -49,7 +49,7 @@ export default function TopicHeatmap({
                   <td key={t.quiz_id} className="p-0">
                     {score === undefined ? (
                       <div className="flex h-9 items-center justify-center rounded-md bg-white/5 text-slate-600">
-                        –
+                        -
                       </div>
                     ) : (
                       <div

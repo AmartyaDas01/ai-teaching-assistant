@@ -13,7 +13,7 @@ export default function Navbar({ title, subtitle, action }: NavbarProps) {
   return (
     <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-[#0a0a0c]/70 px-4 backdrop-blur-md sm:px-6">
       <div className="flex min-w-0 items-center gap-2.5">
-        {/* Opens the off-canvas sidebar — mobile only (it's always visible from md up) */}
+        {/* Opens the off-canvas sidebar - mobile only (it's always visible from md up) */}
         <button
           onClick={() => setSidebarOpen(true)}
           aria-label="Open menu"

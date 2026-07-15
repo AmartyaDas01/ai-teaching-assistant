@@ -82,7 +82,7 @@ export default function Analytics() {
               </Panel>
               <Panel
                 title="Bloom's mastery"
-                subtitle="Accuracy by cognitive level — spot weak areas"
+                subtitle="Accuracy by cognitive level - spot weak areas"
               >
                 <BloomsDistribution data={data.bloom_performance} />
               </Panel>

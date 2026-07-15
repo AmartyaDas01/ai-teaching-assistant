@@ -5,8 +5,8 @@ never touches a developer's real data and each test starts from a clean slate.
 
 The LLM is stubbed. Tests must be deterministic and free: a real model would make the
 quiz assertions flaky (it might phrase a question differently on any run) and would cost
-money on every CI push. Everything *around* the model — ingestion, chunking, embedding,
-retrieval, JSON parsing/repair, scoring, analytics — is exercised for real.
+money on every CI push. Everything *around* the model - ingestion, chunking, embedding,
+retrieval, JSON parsing/repair, scoring, analytics - is exercised for real.
 """
 import json
 import os

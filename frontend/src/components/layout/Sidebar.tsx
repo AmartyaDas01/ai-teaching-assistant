@@ -46,7 +46,7 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Backdrop — mobile only, while the drawer is open */}
+      {/* Backdrop - mobile only, while the drawer is open */}
       {open && (
         <div
           onClick={() => setOpen(false)}
@@ -69,7 +69,7 @@ export default function Sidebar() {
             <div className="text-sm font-bold text-white">AI Teaching</div>
             <div className="text-[11px] text-slate-500">Assistant</div>
           </div>
-          {/* Close — mobile only */}
+          {/* Close - mobile only */}
           <button
             onClick={() => setOpen(false)}
             aria-label="Close menu"

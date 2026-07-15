@@ -44,7 +44,7 @@ def test_citations_arrive_before_the_answer(
     """Sources must come first.
 
     Retrieval has to complete before generation can start anyway, so sending the
-    citations up front costs nothing — and it means the reader sees which material is
+    citations up front costs nothing - and it means the reader sees which material is
     being used *before* the prose, rather than reading an unattributed answer and
     learning its provenance afterwards.
     """

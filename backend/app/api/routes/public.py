@@ -1,4 +1,4 @@
-"""Public student endpoints — take a quiz via a share link, no account needed.
+"""Public student endpoints - take a quiz via a share link, no account needed.
 
 These are the only unauthenticated routes that touch course content. The share token
 is the sole credential, so it is deliberately unguessable (quiz ids are sequential and

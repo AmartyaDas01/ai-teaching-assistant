@@ -1,4 +1,4 @@
-# Lecture 7 — Sorting Algorithms and Complexity Analysis
+# Lecture 7 - Sorting Algorithms and Complexity Analysis
 
 ## 1. Why sorting matters
 
@@ -62,8 +62,8 @@ pivot is in its final position after partitioning, so no merge step is needed.
 
 When the pivot splits the array into two roughly equal halves, the recurrence is
 T(n) = 2T(n/2) + O(n) and quicksort runs in O(n log n). However, if the pivot is always
-the smallest or largest element — which happens on already-sorted input when the first
-element is chosen as the pivot — the partitions are maximally unbalanced, the recursion
+the smallest or largest element - which happens on already-sorted input when the first
+element is chosen as the pivot - the partitions are maximally unbalanced, the recursion
 depth becomes n, and **quicksort degrades to O(n^2)**.
 
 This worst case is avoided in practice by choosing the pivot randomly, or by using the

@@ -8,7 +8,7 @@ on:
 
 jobs:
   backend:
-    name: Backend — tests + RAG eval
+    name: Backend - tests + RAG eval
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -43,7 +43,7 @@ jobs:
         run: python -m eval.run_eval --retrieval-only
 
   frontend:
-    name: Frontend — typecheck + build
+    name: Frontend - typecheck + build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

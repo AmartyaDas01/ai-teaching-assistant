@@ -1,4 +1,4 @@
-"""Analytics endpoints — aggregated performance metrics for the dashboard."""
+"""Analytics endpoints - aggregated performance metrics for the dashboard."""
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 

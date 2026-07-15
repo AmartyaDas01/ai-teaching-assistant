@@ -1,4 +1,4 @@
-"""Shared FastAPI dependencies — the current authenticated user."""
+"""Shared FastAPI dependencies - the current authenticated user."""
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -31,6 +31,6 @@ def get_current_user(
     if not user.is_verified:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Please confirm your email first — check your inbox for the link.",
+            detail="Please confirm your email first - check your inbox for the link.",
         )
     return user

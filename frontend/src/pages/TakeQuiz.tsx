@@ -7,7 +7,7 @@ import type { AttemptResult, PublicQuiz } from "../types";
 type Stage = "loading" | "name" | "taking" | "done" | "error";
 
 /**
- * Public student page (/take/<share_token>) — no account required.
+ * Public student page (/take/<share_token>) - no account required.
  * The share token is the only credential; nothing here is behind auth.
  */
 export default function TakeQuiz({ shareToken }: { shareToken: string }) {
@@ -78,7 +78,7 @@ export default function TakeQuiz({ shareToken }: { shareToken: string }) {
           </div>
         )}
 
-        {/* Ask who's taking it — this is what makes the professor's analytics meaningful. */}
+        {/* Ask who's taking it - this is what makes the professor's analytics meaningful. */}
         {stage === "name" && quiz && (
           <div className="rounded-2xl border border-white/10 bg-surface p-6 shadow-card">
             <h1 className="text-base font-bold text-slate-100">{quiz.title}</h1>
@@ -148,7 +148,7 @@ export default function TakeQuiz({ shareToken }: { shareToken: string }) {
           </div>
         )}
 
-        {/* Students see their score and the explanations — the quiz doubles as feedback. */}
+        {/* Students see their score and the explanations - the quiz doubles as feedback. */}
         {stage === "done" && result && (
           <div className="space-y-4">
             <div className="rounded-2xl border border-white/10 bg-surface p-6 text-center shadow-card">

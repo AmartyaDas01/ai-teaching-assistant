@@ -1,4 +1,4 @@
-"""Transactional email — Brevo HTTPS API, with SMTP as a fallback transport.
+"""Transactional email - Brevo HTTPS API, with SMTP as a fallback transport.
 
 Production uses Brevo because PaaS hosts (Render included) block outbound SMTP ports
 to stop their IPs being used for spam: SMTP there fails with "Network is unreachable"
@@ -52,7 +52,7 @@ def _send_via_brevo(
         with urllib.request.urlopen(request, timeout=20) as response:
             response.read()
     except urllib.error.HTTPError as exc:
-        # Surface Brevo's own message — it names the real cause (unverified sender,
+        # Surface Brevo's own message - it names the real cause (unverified sender,
         # bad key, account not activated for transactional email).
         detail = exc.read().decode("utf-8", "replace")[:300]
         raise RuntimeError(f"Brevo rejected the send ({exc.code}): {detail}") from exc
@@ -81,9 +81,9 @@ def _send(to: str, to_name: str, subject: str, text_body: str, html_body: str) -
 
 
 def send_verification_email(to: str, name: str, verify_url: str) -> None:
-    """Email the signup confirmation link. Never raises — signup must not fail on SMTP."""
+    """Email the signup confirmation link. Never raises - signup must not fail on SMTP."""
     if not settings.email_enabled:
-        logger.info("SMTP not configured — skipping verification email to %s", to)
+        logger.info("SMTP not configured - skipping verification email to %s", to)
         return
 
     subject = "Confirm your email · AI Teaching Assistant"

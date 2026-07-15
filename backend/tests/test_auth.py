@@ -15,7 +15,7 @@ def test_register_returns_a_session_when_email_is_disabled(client):
     )
     assert r.status_code == 201
     body = r.json()
-    # No mail transport configured, so nothing could ever verify the account —
+    # No mail transport configured, so nothing could ever verify the account -
     # it must activate immediately rather than dead-ending the user.
     assert body["verification_required"] is False
     assert body["token"]["access_token"]
@@ -59,7 +59,7 @@ def test_a_verification_token_is_not_usable_as_an_api_credential(client, auth):
     """The two token kinds are separated by a `typ` claim.
 
     Without it, the token inside an emailed confirmation link would be a working
-    bearer token — anyone who saw the link (mail logs, a forwarded email) would hold
+    bearer token - anyone who saw the link (mail logs, a forwarded email) would hold
     a session.
     """
     verification = create_verification_token(1)
@@ -106,7 +106,7 @@ def test_check_email_rejects_a_bad_domain(client, monkeypatch):
 def test_check_email_does_not_reveal_whether_an_account_exists(client, auth):
     """It must not become an account-enumeration oracle.
 
-    A registered address and an unregistered one must be indistinguishable — the
+    A registered address and an unregistered one must be indistinguishable - the
     endpoint reports deliverability only.
     """
     registered = client.get("/auth/me", headers=auth).json()["email"]

@@ -1,4 +1,4 @@
-"""Document model — one uploaded lecture file.
+"""Document model - one uploaded lecture file.
 
 Follows the brief's `documents` schema, adapted for local storage (filepath instead of
 s3_key) and with ingestion status tracking.

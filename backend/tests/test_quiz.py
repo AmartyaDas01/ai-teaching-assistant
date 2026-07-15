@@ -33,7 +33,7 @@ def test_submitting_scores_the_attempt(client, auth, quiz):
     body = r.json()
     assert 0 <= body["score"] <= 100
     assert body["total"] == len(quiz["questions"])
-    # Review mode reveals the key — that's the point of it.
+    # Review mode reveals the key - that's the point of it.
     assert body["graded"][0]["correct_answer"]
 
 

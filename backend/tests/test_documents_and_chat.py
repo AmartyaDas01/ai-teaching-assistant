@@ -1,4 +1,4 @@
-"""Ingestion and grounded chat — including the collection-routing bug this suite exists to prevent."""
+"""Ingestion and grounded chat - including the collection-routing bug this suite exists to prevent."""
 from tests.conftest import SAMPLE_DOC
 
 
@@ -61,7 +61,7 @@ def test_chat_with_no_course_fans_out_across_all_of_them(client, auth, document)
     """'All courses' must search every collection the user owns.
 
     It used to fall back to the oldest course, so a document uploaded to any other
-    course was invisible and chat replied "I couldn't find any relevant content" —
+    course was invisible and chat replied "I couldn't find any relevant content" -
     a false negative, with the document sitting right there.
     """
     r = client.post(

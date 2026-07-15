@@ -69,7 +69,7 @@ export default function ChatWindow({ messages, loading, onSend }: ChatWindowProp
           <MessageBubble key={i} message={m} />
         ))}
 
-        {/* Only until the first token lands — after that the answer itself is the
+        {/* Only until the first token lands - after that the answer itself is the
             progress indicator, and showing both would be noise. */}
         {waitingForFirstToken && (
           <div className="flex items-center gap-2 pl-11 text-sm text-muted">

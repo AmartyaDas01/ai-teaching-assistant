@@ -24,12 +24,12 @@ from app.services import rag_service
 from app.vectorstore import store
 
 BLOOM_DEFINITIONS = {
-    "L1": "Remember — recall facts, terms, and basic concepts",
-    "L2": "Understand — explain ideas or concepts in your own words",
-    "L3": "Apply — use information in new situations to solve problems",
-    "L4": "Analyze — break information into parts and examine relationships",
-    "L5": "Evaluate — justify a decision or judge based on criteria",
-    "L6": "Create — design or produce something new from the material",
+    "L1": "Remember - recall facts, terms, and basic concepts",
+    "L2": "Understand - explain ideas or concepts in your own words",
+    "L3": "Apply - use information in new situations to solve problems",
+    "L4": "Analyze - break information into parts and examine relationships",
+    "L5": "Evaluate - justify a decision or judge based on criteria",
+    "L6": "Create - design or produce something new from the material",
 }
 
 MAX_CONTEXT_CHUNKS = 18
@@ -170,7 +170,7 @@ def generate_quiz(db: Session, req: QuizGenerateRequest, user_id: int) -> Quiz:
     if course is None or course.user_id != user_id:
         raise QuizGenerationError("Document not found.")
     if doc.status != "ready" or not doc.chroma_collection_id:
-        raise QuizGenerationError("Document is not ready — wait for processing to finish.")
+        raise QuizGenerationError("Document is not ready - wait for processing to finish.")
 
     chunks = store.get_document_chunks(
         doc.chroma_collection_id, doc.id, limit=MAX_CONTEXT_CHUNKS

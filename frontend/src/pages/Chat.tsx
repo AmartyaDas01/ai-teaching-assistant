@@ -19,7 +19,7 @@ export default function Chat() {
     ]);
     setLoading(true);
 
-    // Mutate only the final message — it is the one being streamed into.
+    // Mutate only the final message - it is the one being streamed into.
     const patchLast = (change: (m: ChatMessage) => ChatMessage) =>
       setMessages((prev) =>
         prev.map((m, i) => (i === prev.length - 1 ? change(m) : m))

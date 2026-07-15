@@ -1,4 +1,4 @@
-"""Quiz endpoints — generate, list, take, submit, export (scoped to the user)."""
+"""Quiz endpoints - generate, list, take, submit, export (scoped to the user)."""
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session

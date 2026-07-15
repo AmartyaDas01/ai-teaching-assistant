@@ -12,9 +12,9 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  /** Set once a confirmation link has been emailed — swaps the form for a notice. */
+  /** Set once a confirmation link has been emailed - swaps the form for a notice. */
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
-  /** Login was rejected because the account is unverified — offer a resend. */
+  /** Login was rejected because the account is unverified - offer a resend. */
   const [needsVerify, setNeedsVerify] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -28,7 +28,7 @@ export default function Login() {
         if (res.verification_required) {
           setPendingEmail(email);
         } else if (res.token) {
-          // No SMTP configured — the account is active immediately.
+          // No SMTP configured - the account is active immediately.
           setAuth(res.token.access_token, res.token.user);
         }
       } else {
@@ -85,7 +85,7 @@ export default function Login() {
         // credential shouldn't carry over: a password typed to log in would otherwise
         // sit silently pre-filled in the signup form (and vice versa), which is both
         // confusing and a poor thing to leave lying in a field the user didn't fill.
-        // Email is kept — it's the one value that's still relevant either way.
+        // Email is kept - it's the one value that's still relevant either way.
         setPassword("");
         setName("");
       }}
@@ -119,7 +119,7 @@ function CheckInbox({ email, onBack }: { email: string; onBack: () => void }) {
           activate your account.
         </p>
         <p className="mt-3 text-xs text-slate-500">
-          It can take a minute to arrive — check spam if you don't see it.
+          It can take a minute to arrive - check spam if you don't see it.
         </p>
 
         <button

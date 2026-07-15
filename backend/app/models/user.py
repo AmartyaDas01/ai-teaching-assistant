@@ -1,4 +1,4 @@
-"""User model — a professor account."""
+"""User model - a professor account."""
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, Integer, String, func

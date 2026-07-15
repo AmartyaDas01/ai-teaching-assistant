@@ -13,7 +13,7 @@ export interface AuthToken {
 }
 
 /**
- * Signup result. When email verification is on, no token comes back — the account is
+ * Signup result. When email verification is on, no token comes back - the account is
  * inactive until the emailed link is clicked.
  */
 export interface RegisterResponse {
@@ -100,7 +100,7 @@ export interface Quiz {
   share_token: string;
 }
 
-/** A quiz as a student sees it — no ids, no answer key. */
+/** A quiz as a student sees it - no ids, no answer key. */
 export interface PublicQuiz {
   title: string;
   questions: QuizQuestion[];

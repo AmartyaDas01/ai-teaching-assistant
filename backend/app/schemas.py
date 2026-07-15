@@ -37,7 +37,7 @@ class Token(BaseModel):
 class RegisterResponse(BaseModel):
     """Signup result.
 
-    When email verification is on, no token is issued — the account is inactive until
+    When email verification is on, no token is issued - the account is inactive until
     the emailed link is clicked. When SMTP isn't configured, verification is skipped
     and a token comes back immediately, so local dev stays zero-config.
     """

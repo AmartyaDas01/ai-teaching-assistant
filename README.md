@@ -12,10 +12,10 @@ retrieval spans an entire course syllabus rather than a single file, quiz genera
 pedagogically structured around Bloom's cognitive levels, and quiz results feed a real
 analytics layer that surfaces which topics a cohort is struggling with.
 
-Built by **Amartya Das** — Assistant Professor, Dept. of Computer Science &
+Built by **Amartya Das**, Assistant Professor, Dept. of Computer Science &
 Engineering, Dayananda Sagar University, Bangalore.
 
-**[▶ Live demo](https://ai-ta-frontend.onrender.com)**
+**[Live demo](https://ai-ta-frontend.onrender.com)**
 
 <!-- Record a ~60s walkthrough, save it as docs/demo.gif, and uncomment:
 ![Demo](docs/demo.gif)
@@ -25,34 +25,34 @@ Engineering, Dayananda Sagar University, Bangalore.
 
 ## Features
 
-**📚 Course-scoped document management**
+**Course-scoped document management**
 Upload PDF, DOCX, PPTX, and TXT files, organized by course. Each course maps to its own
 vector collection, so retrieval naturally spans every document in a syllabus instead of
 being trapped in one file.
 
-**💬 Grounded chat with citations**
+**Grounded chat with citations**
 Ask a question and get an answer built strictly from your uploaded material. Every
 response cites the document and page it came from, so claims are auditable. With no
 course selected, retrieval fans out across all of your courses and merges the best
 matches.
 
-**📝 Bloom's Taxonomy quiz generator**
+**Bloom's Taxonomy quiz generator**
 Generate MCQs from any document, with each question tagged to a Bloom's level
 (L1 Remember → L6 Create). Pick the levels, difficulty, and question count; take the
 quiz in-app; get scored with per-question explanations. Export as JSON.
 
-**📊 Student performance analytics**
+**Student performance analytics**
 Scores over time, accuracy broken down by Bloom's level (to spot *which kind* of
 thinking a cohort struggles with, not just "who scored low"), and a per-student
 weak-area heatmap across quizzes.
 
-**🔌 Swappable AI providers**
+**Swappable AI providers**
 Chat and quiz generation run on **OpenAI GPT-4o** or a **local Ollama** model, switchable
-at runtime from the Settings page — no redeploy. Embeddings are likewise either local
+at runtime from the Settings page with no redeploy. Embeddings are likewise either local
 (`sentence-transformers`) or OpenAI. Institutions that can't send data to a third party
 can run the whole thing locally.
 
-**🔐 Multi-user auth**
+**Multi-user auth**
 JWT + bcrypt. All courses, documents, quizzes, and analytics are scoped to the
 authenticated user.
 
@@ -64,7 +64,7 @@ authenticated user.
 |---|---|
 | **API** | FastAPI (Python 3.12), Pydantic v2 |
 | **RAG** | LangChain · recursive chunking (500/50) · top-k cosine retrieval |
-| **Vector store** | ChromaDB (local) or **Qdrant** (remote/production) — selectable |
+| **Vector store** | ChromaDB (local) or **Qdrant** (remote/production), selectable |
 | **Embeddings** | `all-MiniLM-L6-v2` (local, 384-d) or OpenAI `text-embedding-3-small` (1536-d) |
 | **LLM** | OpenAI GPT-4o or Ollama (`llama3`) |
 | **Database** | PostgreSQL (production) / SQLite (dev) via SQLAlchemy 2 |
@@ -78,17 +78,17 @@ authenticated user.
 ## How the RAG pipeline works
 
 ```
-Upload  ──▶  parse (PyMuPDF / docx / pptx)
-        ──▶  chunk (recursive, 500 tokens / 50 overlap)
-        ──▶  embed (local MiniLM  ·or·  OpenAI text-embedding-3-small)
-        ──▶  store in the course's vector collection
+Upload  -->  parse (PyMuPDF / docx / pptx)
+        -->  chunk (recursive, 500 tokens / 50 overlap)
+        -->  embed (local MiniLM  ·or·  OpenAI text-embedding-3-small)
+        -->  store in the course's vector collection
              (metadata: doc_id, course_id, page, chunk_index)
 
-Query   ──▶  embed the question
-        ──▶  top-k cosine search across the course's collection(s)
-        ──▶  build a grounded prompt from the retrieved excerpts
-        ──▶  LLM answers using ONLY those excerpts
-        ──▶  return the answer + source citations (document + page)
+Query   -->  embed the question
+        -->  top-k cosine search across the course's collection(s)
+        -->  build a grounded prompt from the retrieved excerpts
+        -->  LLM answers using ONLY those excerpts
+        -->  return the answer + source citations (document + page)
 ```
 
 Quiz generation reuses the same index: it pulls broad coverage of a document's chunks,
@@ -100,7 +100,7 @@ repairs the output before persisting.
 ## Evaluation
 
 The RAG pipeline is measured, not assumed. [`backend/eval`](./backend/eval) runs the real
-stack — same chunker, embeddings, vector store and prompt — against a labelled reference
+stack (same chunker, embeddings, vector store and prompt) against a labelled reference
 set, scoring retrieval and generation separately (they fail differently, and one score
 hides which broke).
 
@@ -115,7 +115,7 @@ hides which broke).
 
 The reference set includes deliberately **unanswerable** questions: a teaching assistant
 that won't say *"I don't know"* will eventually invent an answer for a student, so refusal
-is measured explicitly. Groundedness is scored apart from correctness for the same reason —
+is measured explicitly. Groundedness is scored apart from correctness for the same reason:
 an answer can be *right yet ungrounded*, where the model recites a fact from pre-training
 that the retrieved context never supported. Exactly one question does that, and it is the
 one where retrieval surfaced only half the required evidence.
@@ -172,8 +172,8 @@ pytest
 
 42 tests covering auth, ingestion, retrieval, quiz generation, scoring, the public
 student link, analytics and the chunker. The LLM is stubbed: tests must be deterministic
-and free — a real model phrases questions differently on every run and would bill each
-CI push — while everything around it (chunking, embedding, retrieval, JSON repair,
+and free (a real model phrases questions differently on every run and would bill each
+CI push) while everything around it (chunking, embedding, retrieval, JSON repair,
 scoring, aggregation) runs for real.
 
 The bugs that actually shipped are encoded as tests so they cannot return: uploading with
@@ -189,27 +189,27 @@ All settings live in a root `.env` (see [`.env.example`](./.env.example)).
 |---|---|
 | `LLM_PROVIDER` | `openai` or `ollama` |
 | `OPENAI_API_KEY` | Enables GPT-4o; without it the app falls back to Ollama |
-| `EMBEDDING_PROVIDER` | `local` (MiniLM) or `openai` (no local model → tiny RAM footprint) |
+| `EMBEDDING_PROVIDER` | `local` (MiniLM) or `openai` (no local model, tiny RAM footprint) |
 | `VECTOR_STORE` | `chroma` (on-disk) or `qdrant` (remote, survives restarts) |
 | `QDRANT_URL` / `QDRANT_API_KEY` | Qdrant Cloud cluster, when `VECTOR_STORE=qdrant` |
 | `DATABASE_URL` | SQLite locally; a Postgres URL in production |
 | `JWT_SECRET_KEY` | Signs auth tokens |
 
 > Embedding providers produce different vector sizes (384 vs 1536), so a collection is
-> bound to whichever created it — switching providers means re-uploading documents.
+> bound to whichever created it: switching providers means re-uploading documents.
 
 ---
 
 ## Deployment
 
-The whole app deploys from a single [`render.yaml`](./render.yaml) Blueprint — a static
-frontend plus a Dockerized backend — and runs entirely on **free tiers**:
+The whole app deploys from a single [`render.yaml`](./render.yaml) Blueprint (a static
+frontend plus a Dockerized backend) and runs entirely on **free tiers**:
 
-- **Render** — backend (Docker) + frontend (static site)
-- **Qdrant Cloud** — vectors (free 1 GB); remote, so they survive the free tier's lack of
+- **Render**: backend (Docker) + frontend (static site)
+- **Qdrant Cloud**: vectors (free 1 GB); remote, so they survive the free tier's lack of
   a persistent disk
-- **Neon** — Postgres (free, permanent)
-- **OpenAI** — GPT-4o for generation and `text-embedding-3-small` for embeddings. Using
+- **Neon**: Postgres (free, permanent)
+- **OpenAI**: GPT-4o for generation and `text-embedding-3-small` for embeddings. Using
   OpenAI embeddings means no local model is loaded, which keeps the backend inside
   Render's free 512 MB memory limit.
 

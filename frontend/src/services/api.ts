@@ -80,8 +80,8 @@ export interface EmailCheck {
 }
 
 /**
- * Does this address actually exist? The server does a real DNS/MX lookup — the same
- * one signup performs — so a dead domain is caught while typing instead of after a
+ * Does this address actually exist? The server does a real DNS/MX lookup - the same
+ * one signup performs - so a dead domain is caught while typing instead of after a
  * failed submit. It never reveals whether the address is already registered.
  */
 export async function checkEmail(
@@ -196,7 +196,7 @@ export interface StreamHandlers {
 
 /**
  * Streaming chat. Uses fetch rather than axios because XHR can't expose a response
- * body incrementally in the browser — axios would only resolve once the whole answer
+ * body incrementally in the browser - axios would only resolve once the whole answer
  * had arrived, which defeats the purpose.
  *
  * The server sends citations first, then the answer token by token.
@@ -290,7 +290,7 @@ export function quizExportUrl(id: number): string {
   return `${baseURL}/quiz/${id}/export`;
 }
 
-// ─── Public (student) — no account, no auth header ───────────────
+// ─── Public (student) - no account, no auth header ───────────────
 
 /** Build the link a professor hands to students. */
 export function quizShareUrl(shareToken: string): string {

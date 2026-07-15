@@ -1,4 +1,4 @@
-"""Authentication endpoints — register, verify, login, current user."""
+"""Authentication endpoints - register, verify, login, current user."""
 from email_validator import EmailNotValidError, validate_email
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -67,7 +67,7 @@ def _send_verification(background: BackgroundTasks, user: User) -> None:
 def check_email(payload: EmailCheckRequest):
     """Is this address real? Used by the signup form while the user types.
 
-    Runs the same validation signup does — including the MX lookup — so a bad domain
+    Runs the same validation signup does - including the MX lookup - so a bad domain
     is caught at the keystroke rather than after a failed submit.
 
     It deliberately does NOT report whether the address is already registered. That
@@ -135,7 +135,7 @@ def verify(payload: VerifyRequest, db: Session = Depends(get_db)):
         user.is_verified = True
         db.commit()
         db.refresh(user)
-    # Verifying signs them straight in — clicking the link is proof enough.
+    # Verifying signs them straight in - clicking the link is proof enough.
     return _token_for(user)
 
 
@@ -159,7 +159,7 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
     if not user.is_verified:
         raise HTTPException(
             status_code=403,
-            detail="Please confirm your email first — check your inbox for the link.",
+            detail="Please confirm your email first - check your inbox for the link.",
         )
     return _token_for(user)
 

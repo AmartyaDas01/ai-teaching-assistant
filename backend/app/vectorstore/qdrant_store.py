@@ -1,9 +1,9 @@
-"""Qdrant vector store — one collection per course.
+"""Qdrant vector store - one collection per course.
 
 Drop-in alternative to chroma_store (same function signatures), selected with
 VECTOR_STORE=qdrant. Vectors live in a remote Qdrant instance rather than on local
 disk, so they survive restarts on hosts with no persistent disk (e.g. free tiers)
-— which is the whole reason this backend exists.
+- which is the whole reason this backend exists.
 
 Set QDRANT_URL (+ QDRANT_API_KEY for Qdrant Cloud). With neither set, an in-memory
 client is used, which is handy for tests but persists nothing.
@@ -177,5 +177,5 @@ def delete_collection(collection_name: str) -> None:
         if client.collection_exists(collection_name):
             client.delete_collection(collection_name)
     except Exception:
-        # Collection may not exist (ingestion failed before any add) — nothing to do.
+        # Collection may not exist (ingestion failed before any add) - nothing to do.
         pass

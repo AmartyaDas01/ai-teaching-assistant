@@ -37,7 +37,7 @@ def create_and_ingest(
 
     Raises ValueError for unsupported file types, a missing course selection, or a
     course the user doesn't own. A document is always ingested into an explicitly
-    chosen course's collection — we never guess a default, so an upload can't be
+    chosen course's collection - we never guess a default, so an upload can't be
     silently misrouted to the wrong ChromaDB collection.
     """
     file_type = detect_file_type(upload.filename or "")

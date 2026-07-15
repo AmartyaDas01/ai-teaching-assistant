@@ -47,7 +47,7 @@ def get_db() -> Generator[Session, None, None]:
 def ensure_schema() -> None:
     """Add columns that were introduced after a table already existed.
 
-    `create_all` only creates *missing tables* — it will not add a new column to a
+    `create_all` only creates *missing tables* - it will not add a new column to a
     table that already exists. Without this, `users.is_verified` would silently never
     appear on a database created before email verification was added, and every query
     touching it would fail.
@@ -59,7 +59,7 @@ def ensure_schema() -> None:
     tables = inspector.get_table_names()
     is_sqlite = settings.database_url.startswith("sqlite")
 
-    # users.is_verified — accounts that predate email verification are backfilled as
+    # users.is_verified - accounts that predate email verification are backfilled as
     # verified rather than being locked out of their own app.
     if "users" in tables:
         columns = {c["name"] for c in inspector.get_columns("users")}
@@ -76,7 +76,7 @@ def ensure_schema() -> None:
                 "Added users.is_verified; existing accounts backfilled as verified."
             )
 
-    # quizzes.share_token — the public student link. Existing quizzes need a token
+    # quizzes.share_token - the public student link. Existing quizzes need a token
     # each; the column is added nullable, backfilled per-row, then made unique.
     if "quizzes" in tables:
         columns = {c["name"] for c in inspector.get_columns("quizzes")}

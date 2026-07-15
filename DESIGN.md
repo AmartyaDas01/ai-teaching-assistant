@@ -14,9 +14,9 @@ inert. This project is built around three things a teacher actually needs:
 1. **Retrieval across a whole syllabus**, not one file. Vector collections are scoped to
    a *course*, so a question can pull evidence from any lecture in it.
 2. **Assessment that maps to cognitive levels.** Quizzes are generated against Bloom's
-   Taxonomy (L1–L6), because "can they recall it" and "can they apply it" are different
+   Taxonomy (L1-L6), because "can they recall it" and "can they apply it" are different
    questions and should be measured separately.
-3. **Analytics that answer "what should I reteach?"** — accuracy broken down by Bloom's
+3. **Analytics that answer "what should I reteach?"** - accuracy broken down by Bloom's
    level and by topic, not just a leaderboard of scores.
 
 ---
@@ -47,7 +47,7 @@ and the 50-token overlap stops a definition from being cut in half at a boundary
 **One collection per course, not per document.** This is what makes cross-document
 questions work naturally: "compare the two sorting algorithms we covered" can hit chunks
 from different lectures. When no course is selected, retrieval fans out across every
-collection the user owns and merges the globally closest matches — cosine distance is
+collection the user owns and merges the globally closest matches - cosine distance is
 comparable across collections because they share an embedding model.
 
 **Citations are non-negotiable.** Because `doc_id` and `page_number` are stored as vector
@@ -60,7 +60,7 @@ worse than none: a confidently wrong answer to a student is a real cost.
 
 ```
 select     a document + Bloom's levels + difficulty + question count
-retrieve   broad coverage of that document's chunks (not similarity — coverage)
+retrieve   broad coverage of that document's chunks (not similarity - coverage)
 prompt     LLM in JSON mode, with explicit definitions of each Bloom's level
 validate   parse JSON (tolerating fences/prose), check option counts, match the
            stated answer back to an actual option, normalize the Bloom's level
@@ -92,7 +92,7 @@ quiz_attempts (id, quiz_id, student_name, answers_json, score, attempted_at)
 
 `Course` is the hub of the model: it owns the documents, and its id derives the name of
 the vector collection (`course_{id}`). That makes it the single join between the
-relational world (who owns what) and the vector world (where the embeddings live) — so
+relational world (who owns what) and the vector world (where the embeddings live) - so
 ownership checks and retrieval scope stay consistent with each other.
 
 ---
@@ -113,13 +113,13 @@ interface, so swapping either is configuration, not a code change.
 
 **Caveat:** embedding providers produce different vector dimensions (384 vs 1536), so a
 collection is bound to whichever model created it. Switching providers requires
-re-ingesting documents — there is no safe way to mix them in one index.
+re-ingesting documents - there is no safe way to mix them in one index.
 
 ---
 
 ## Notable implementation decisions
 
-- **Synchronous ingestion.** Parsing + embedding a large PDF takes ~10–30s. A task queue
+- **Synchronous ingestion.** Parsing + embedding a large PDF takes ~10-30s. A task queue
   (Celery/Redis) would move this off the request path; it's deliberately deferred, since
   for single-professor use the added infrastructure costs more than it buys.
 - **Explicit course selection on upload and chat.** An earlier version silently fell back
