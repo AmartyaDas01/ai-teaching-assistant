@@ -73,6 +73,55 @@ export default function NeuralAccessLogin({
   const [resent, setResent] = useState(false);
 
   /**
+   * Custom required-field warnings, replacing the browser's native validation
+   * bubbles (the form is noValidate). A failed submit shows one warning per
+   * offending field; the batch clears itself after 5 seconds, and typing in a
+   * field dismisses its warning early so the text never contradicts the input.
+   */
+  const [warnings, setWarnings] = useState<{
+    name?: string;
+    email?: string;
+    password?: string;
+  }>({});
+  const warnTimer = useRef<number | undefined>(undefined);
+
+  useEffect(() => () => window.clearTimeout(warnTimer.current), []);
+
+  const clearWarning = (field: keyof typeof warnings) =>
+    setWarnings((w) => (w[field] ? { ...w, [field]: undefined } : w));
+
+  const handleSubmit = (e: FormEvent) => {
+    const next: typeof warnings = {};
+    if (mode === "register" && !name.trim()) {
+      next.name = "Please enter your full name.";
+    }
+    // A malformed address also blocks here: noValidate turns off the browser's
+    // type="email" check, which used to catch it in login mode.
+    next.email = !email.trim()
+      ? "Please enter your email address."
+      : inspectEmail(email).error;
+    if (!password) {
+      next.password =
+        mode === "login"
+          ? "Please enter your password."
+          : "Please choose a password.";
+    }
+
+    const missing = (["name", "email", "password"] as const).filter(
+      (f) => next[f]
+    );
+    if (missing.length > 0) {
+      e.preventDefault();
+      setWarnings(next);
+      window.clearTimeout(warnTimer.current);
+      warnTimer.current = window.setTimeout(() => setWarnings({}), 5000);
+      document.getElementById(`na-${missing[0]}`)?.focus();
+      return;
+    }
+    onSubmit(e);
+  };
+
+  /**
    * Live email verification.
    *
    * Two stages, cheapest first: the format is checked in the browser (instant, no
@@ -553,20 +602,31 @@ export default function NeuralAccessLogin({
           </h1>
         </header>
 
-        <form autoComplete="on" onSubmit={onSubmit}>
+        <form autoComplete="on" noValidate onSubmit={handleSubmit}>
           {mode === "register" && (
             <div className="form-group">
               <label htmlFor="na-name">Full Name</label>
-              <input
-                id="na-name"
-                type="text"
-                autoComplete="name"
-                placeholder="Your Name"
-                value={name}
-                onChange={(e) => onNameChange(e.target.value)}
-                required
-              />
-              <div className="input-glow" />
+              <div className="input-wrap">
+                <input
+                  id="na-name"
+                  type="text"
+                  autoComplete="name"
+                  placeholder="Your Name"
+                  value={name}
+                  onChange={(e) => {
+                    onNameChange(e.target.value);
+                    clearWarning("name");
+                  }}
+                  aria-invalid={Boolean(warnings.name)}
+                  required
+                />
+                <div className="input-glow" />
+              </div>
+              {warnings.name && (
+                <div className="field-note error" role="alert">
+                  {warnings.name}
+                </div>
+              )}
             </div>
           )}
 
@@ -582,8 +642,11 @@ export default function NeuralAccessLogin({
                 autoComplete="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => onEmailChange(e.target.value)}
-                aria-invalid={emailState === "invalid"}
+                onChange={(e) => {
+                  onEmailChange(e.target.value);
+                  clearWarning("email");
+                }}
+                aria-invalid={emailState === "invalid" || Boolean(warnings.email)}
                 aria-describedby="na-email-status"
                 required
               />
@@ -591,6 +654,14 @@ export default function NeuralAccessLogin({
             </div>
 
             <div id="na-email-status" role="status" aria-live="polite">
+              {/* Skipped when the live checker already shows the same text, so a
+                  malformed address at submit doesn't render the message twice. */}
+              {warnings.email && warnings.email !== emailMessage && (
+                <div className="field-note error" role="alert">
+                  {warnings.email}
+                </div>
+              )}
+
               {emailState === "checking" && (
                 <div className="field-note checking">Checking address…</div>
               )}
@@ -627,16 +698,27 @@ export default function NeuralAccessLogin({
 
           <div className="form-group">
             <label htmlFor="na-password">Password</label>
-            <input
-              id="na-password"
-              type="password"
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => onPasswordChange(e.target.value)}
-              required
-            />
-            <div className="input-glow" />
+            <div className="input-wrap">
+              <input
+                id="na-password"
+                type="password"
+                autoComplete={mode === "login" ? "current-password" : "new-password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => {
+                  onPasswordChange(e.target.value);
+                  clearWarning("password");
+                }}
+                aria-invalid={Boolean(warnings.password)}
+                required
+              />
+              <div className="input-glow" />
+            </div>
+            {warnings.password && (
+              <div className="field-note error" role="alert">
+                {warnings.password}
+              </div>
+            )}
           </div>
 
           {error && (
@@ -673,7 +755,16 @@ export default function NeuralAccessLogin({
         </form>
 
         <footer className="footer-nav">
-          <button type="button" className="link-btn" onClick={onToggleMode}>
+          <button
+            type="button"
+            className="link-btn"
+            onClick={() => {
+              // A lingering "full name" warning would point at a field that no
+              // longer exists after switching to login mode.
+              setWarnings({});
+              onToggleMode();
+            }}
+          >
             {mode === "login" ? "Create an account" : "Have an account? Sign in"}
           </button>
           <span className="footer-tag">SECURE SESSION</span>
