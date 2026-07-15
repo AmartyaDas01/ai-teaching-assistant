@@ -599,8 +599,14 @@ export default function NeuralAccessLogin({
                 <div className="field-note error">{emailMessage}</div>
               )}
 
-              {emailState === "valid" && !suggestion && (
-                <div className="field-note ok">Address looks good</div>
+              {emailState === "valid" && !suggestion && mode === "register" && (
+                // "Address looks good" reports the domain check that passed; the second
+                // half sets the honest expectation, since no check can prove a specific
+                // Gmail/Outlook mailbox exists (providers accept-all to stop
+                // enumeration) — the confirmation link is the real proof.
+                <div className="field-note ok">
+                  Address looks good, a confirmation link will be sent here
+                </div>
               )}
 
               {suggestion && (
