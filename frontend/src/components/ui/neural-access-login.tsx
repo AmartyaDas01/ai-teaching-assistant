@@ -93,7 +93,7 @@ export default function NeuralAccessLogin({
   const handleSubmit = (e: FormEvent) => {
     const next: typeof warnings = {};
     if (mode === "register" && !name.trim()) {
-      next.name = "Please enter your full name.";
+      next.name = "Please enter your name.";
     }
     // A malformed address also blocks here: noValidate turns off the browser's
     // type="email" check, which used to catch it in login mode.
@@ -605,13 +605,13 @@ export default function NeuralAccessLogin({
         <form autoComplete="on" noValidate onSubmit={handleSubmit}>
           {mode === "register" && (
             <div className="form-group">
-              <label htmlFor="na-name">Full Name</label>
+              <label htmlFor="na-name">Name</label>
               <div className="input-wrap">
                 <input
                   id="na-name"
                   type="text"
                   autoComplete="name"
-                  placeholder="Your Name"
+                  placeholder="Your name"
                   value={name}
                   onChange={(e) => {
                     onNameChange(e.target.value);
@@ -640,7 +640,7 @@ export default function NeuralAccessLogin({
                 id="na-email"
                 type="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder="yourname@example.com"
                 value={email}
                 onChange={(e) => {
                   onEmailChange(e.target.value);
