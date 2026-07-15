@@ -214,8 +214,8 @@ export default function NeuralAccessLogin({
     return () => document.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  const heroTop = mode === "login" ? "WELCOME" : "REQUEST";
-  const heroBottom = mode === "login" ? "BACK" : "ACCESS";
+  const heroTop = mode === "login" ? "WELCOME" : "GET";
+  const heroBottom = mode === "login" ? "BACK" : "STARTED";
   const submitLabel = loading
     ? mode === "login"
       ? "Signing in…"
