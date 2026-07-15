@@ -136,7 +136,9 @@ cd backend
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-cp ../.env.example ../.env      # then edit as needed (see below)
+# No .env is required to start: every setting has a local-first default
+# (SQLite, on-disk ChromaDB, local embeddings). Create a root .env only to
+# override them, e.g. to add an OpenAI key. See Configuration below.
 
 uvicorn app.main:app --reload
 ```
@@ -183,7 +185,20 @@ being usable as an API credential.
 
 ## Configuration
 
-All settings live in a root `.env` (see [`.env.example`](./.env.example)).
+The app runs with zero configuration: every setting has a sensible local-first default
+baked into [`backend/app/config.py`](./backend/app/config.py). To override any of them,
+create a `.env` in the repo root (it is gitignored) with just the keys you want to
+change. A minimal `.env` to use OpenAI instead of the local defaults:
+
+```env
+LLM_PROVIDER=openai
+OPENAI_API_KEY=sk-...
+EMBEDDING_PROVIDER=openai      # optional: skips loading the local embedding model
+JWT_SECRET_KEY=change-me       # any long random string
+```
+
+The full set of variables, with defaults and inline notes, is defined in `config.py`.
+The most useful ones:
 
 | Variable | Purpose |
 |---|---|

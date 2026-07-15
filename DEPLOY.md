@@ -100,7 +100,9 @@ backend's health endpoint every ~10 minutes:
 
 ## Environment variables reference
 
-See [`.env.example`](./.env.example). Key ones for production:
+Every setting has a default in [`backend/app/config.py`](./backend/app/config.py);
+override any of them via the environment (a root `.env` locally, or the service's
+env vars on Render). Key ones for production:
 
 | Var | Purpose |
 |-----|---------|
