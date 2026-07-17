@@ -96,9 +96,9 @@ point a free uptime pinger at the health endpoint every ~10 minutes.
 
 [UptimeRobot](https://uptimerobot.com) works too (5-minute checks on the free tier).
 
-> A Claude Code scheduled routine is **not** suitable here: routines have a 1-hour
-> minimum interval, so they can't ping often enough to beat the 15-minute idle timeout
-> (and each run spins up a full cloud agent). Use a dedicated uptime pinger instead.
+> Use a dedicated uptime pinger, not a general-purpose scheduler: anything with a
+> coarse minimum interval (e.g. hourly) can't fire often enough to beat the 15-minute
+> idle timeout, so the service still sleeps between pings.
 
 `/health` returns `{"status":"ok", ...}` with HTTP 200, so no auth or custom headers
 are needed.
