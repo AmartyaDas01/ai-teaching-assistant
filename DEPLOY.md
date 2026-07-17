@@ -79,11 +79,29 @@ the backend service, and CORS already allows any `*.onrender.com` origin.
 
 ### C. Keep it warm (avoids 30-60s cold starts)
 
-Free Render services sleep after ~15 min idle. Point a free uptime pinger at the
-backend's health endpoint every ~10 minutes:
+Free Render services sleep after ~15 minutes of inactivity. The next request then
+hangs 30-60s while the container boots, which on the signup form shows up as a stuck
+"Checking address…" and "Creating…". The frontend surfaces a "server is waking up"
+hint so this doesn't look broken, but the real fix is to never let the backend sleep:
+point a free uptime pinger at the health endpoint every ~10 minutes.
 
-- [cron-job.org](https://cron-job.org) or [UptimeRobot](https://uptimerobot.com)
-- URL: `https://<your-backend>.onrender.com/health`
+**cron-job.org** (free, supports sub-hour intervals):
+
+1. Sign up at [cron-job.org](https://cron-job.org).
+2. **Create cronjob** with:
+   - URL: `https://<your-backend>.onrender.com/health` (GET)
+   - Schedule: every 10 minutes (`*/10` in the minute field)
+3. Optional: enable **Notify on failure** to also get an email if the backend goes
+   down, turning the pinger into a free uptime monitor.
+
+[UptimeRobot](https://uptimerobot.com) works too (5-minute checks on the free tier).
+
+> A Claude Code scheduled routine is **not** suitable here: routines have a 1-hour
+> minimum interval, so they can't ping often enough to beat the 15-minute idle timeout
+> (and each run spins up a full cloud agent). Use a dedicated uptime pinger instead.
+
+`/health` returns `{"status":"ok", ...}` with HTTP 200, so no auth or custom headers
+are needed.
 
 ### D. Verify
 
