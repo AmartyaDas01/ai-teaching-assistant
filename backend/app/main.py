@@ -14,7 +14,7 @@ logging.basicConfig(
     format="%(levelname)s %(name)s: %(message)s",
 )
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import (
@@ -115,10 +115,23 @@ class _SuppressHealthAccessLogs(logging.Filter):
     """
 
     def filter(self, record: logging.LogRecord) -> bool:
-        return "GET /health" not in record.getMessage()
+        msg = record.getMessage()
+        return "GET /health" not in msg and "/ping" not in msg
 
 
 logging.getLogger("uvicorn.access").addFilter(_SuppressHealthAccessLogs())
+
+
+@app.api_route("/ping", methods=["GET", "HEAD"], tags=["health"], include_in_schema=False)
+def ping() -> Response:
+    """Zero-body liveness endpoint for uptime pingers.
+
+    Returns 204 No Content so a free-tier pinger (e.g. cron-job.org) can't trip its
+    "response too large" abort, which a body-carrying /health can when the CDN serves
+    it without a Content-Length. Accepts HEAD as well. Any hit also wakes the service
+    if it had spun down, which is the whole point of pinging it on a schedule.
+    """
+    return Response(status_code=204)
 
 
 @app.get("/health", tags=["health"])

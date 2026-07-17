@@ -89,10 +89,16 @@ point a free uptime pinger at the health endpoint every ~10 minutes.
 
 1. Sign up at [cron-job.org](https://cron-job.org).
 2. **Create cronjob** with:
-   - URL: `https://<your-backend>.onrender.com/health` (GET)
+   - URL: `https://<your-backend>.onrender.com/ping` (GET)
    - Schedule: every 10 minutes (`*/10` in the minute field)
 3. Optional: enable **Notify on failure** to also get an email if the backend goes
    down, turning the pinger into a free uptime monitor.
+
+Use `/ping`, not `/health`, for the pinger: `/ping` returns **204 No Content** (empty
+body), whereas `/health` returns a JSON body that the CDN serves without a
+Content-Length, which cron-job.org's free tier aborts as "output too large" and, after
+enough failures, auto-disables the job. `/health` is still the endpoint to hit by hand
+when you want to see the active providers.
 
 [UptimeRobot](https://uptimerobot.com) works too (5-minute checks on the free tier).
 
