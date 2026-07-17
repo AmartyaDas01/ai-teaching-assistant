@@ -21,7 +21,10 @@ import type {
 const rawApiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 const baseURL = /^https?:\/\//.test(rawApiUrl) ? rawApiUrl : `https://${rawApiUrl}`;
 
-export const api = axios.create({ baseURL });
+// A generous timeout so a request can't hang forever if the backend is unreachable,
+// while still tolerating a Render free-tier cold start (the idle backend can take
+// ~60s to wake). Long-running calls like uploads override this per request.
+export const api = axios.create({ baseURL, timeout: 90000 });
 
 // ─── Auth token wiring ───────────────────────────────────────────
 let authToken: string | null = localStorage.getItem("ata_token");
@@ -164,6 +167,9 @@ export async function uploadDocument(
     params: opts.courseId ? { course_id: opts.courseId } : undefined,
     headers: { "Content-Type": "multipart/form-data" },
     signal: opts.signal,
+    // Parsing + embedding happens in this request and can outlast the default
+    // timeout for a large PDF, so let the upload run as long as it needs.
+    timeout: 0,
     onUploadProgress: (e) => {
       if (opts.onProgress && e.total) {
         opts.onProgress(Math.round((e.loaded / e.total) * 100));

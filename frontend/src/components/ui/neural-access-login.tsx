@@ -137,6 +137,26 @@ export default function NeuralAccessLogin({
   const [emailMessage, setEmailMessage] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<string | null>(null);
 
+  /**
+   * "Server waking up" hints. The backend runs on a free tier that sleeps when idle,
+   * so the first request after a pause can take ~60s to answer. Without feedback the
+   * form just sits on "Checking address…" / "Creating…" and looks broken; these flags
+   * flip on once a request has been outstanding a few seconds so we can say what's
+   * actually happening. `slowCheck` covers the live email check, `slowSubmit` the
+   * login/register submit.
+   */
+  const [slowCheck, setSlowCheck] = useState(false);
+  const [slowSubmit, setSlowSubmit] = useState(false);
+
+  useEffect(() => {
+    if (!loading) {
+      setSlowSubmit(false);
+      return;
+    }
+    const t = window.setTimeout(() => setSlowSubmit(true), 4000);
+    return () => window.clearTimeout(t);
+  }, [loading]);
+
   useEffect(() => {
     const value = email.trim();
     setSuggestion(null);
@@ -156,7 +176,11 @@ export default function NeuralAccessLogin({
     }
 
     setEmailState("checking");
+    setSlowCheck(false);
     const controller = new AbortController();
+    // If the check is still outstanding after a few seconds the backend is likely
+    // waking from idle; swap in a message that says so.
+    const wakeTimer = window.setTimeout(() => setSlowCheck(true), 4000);
     const timer = setTimeout(async () => {
       try {
         const result = await checkEmail(value, controller.signal);
@@ -171,15 +195,19 @@ export default function NeuralAccessLogin({
           if (local.suggestion) setSuggestion(local.suggestion);
         }
       } catch {
-        // Offline or the request was superseded: never block signup on our own
-        // convenience check - the server validates again at submit anyway.
+        // Offline, timed out, or the request was superseded: never block signup on our
+        // own convenience check - the server validates again at submit anyway.
         if (!controller.signal.aborted) setEmailState("idle");
+      } finally {
+        window.clearTimeout(wakeTimer);
+        setSlowCheck(false);
       }
     }, 700);
 
     return () => {
       controller.abort();
       clearTimeout(timer);
+      window.clearTimeout(wakeTimer);
     };
   }, [email]);
   // Generate static random blob values once per mount to keep positions stable.
@@ -400,6 +428,14 @@ export default function NeuralAccessLogin({
 
         .mercury-wrapper .field-note.checking {
           color: var(--text-dim);
+        }
+
+        /* The waking-server note sits under the submit button, so give it room and
+           center it to read as an intentional status line rather than a field error. */
+        .mercury-wrapper .field-note.wake-note {
+          margin-top: 20px;
+          text-align: center;
+          line-height: 1.5;
         }
 
         .mercury-wrapper .suggest-link {
@@ -663,7 +699,11 @@ export default function NeuralAccessLogin({
               )}
 
               {emailState === "checking" && (
-                <div className="field-note checking">Checking address…</div>
+                <div className="field-note checking">
+                  {slowCheck
+                    ? "Waking the server, this can take up to a minute…"
+                    : "Checking address…"}
+                </div>
               )}
 
               {emailState === "invalid" && emailMessage && (
@@ -752,6 +792,13 @@ export default function NeuralAccessLogin({
               {submitLabel}
             </button>
           </div>
+
+          {slowSubmit && (
+            <div className="field-note checking wake-note" role="status">
+              The server was asleep and is waking up. This first request can take up to
+              a minute, please wait…
+            </div>
+          )}
         </form>
 
         <footer className="footer-nav">
