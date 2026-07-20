@@ -8,7 +8,7 @@ import {
   Settings as SettingsIcon,
   X,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAppStore } from "../../store/useAppStore";
 import CourseSelector from "./CourseSelector";
@@ -21,11 +21,81 @@ const links = [
   { to: "/settings", label: "Settings", Icon: SettingsIcon },
 ];
 
+// Desktop sidebar resize bounds. The min keeps the longest nav label ("Quiz
+// Generator") on one line; the max stops it from crowding out the content.
+const MIN_WIDTH = 208;
+const MAX_WIDTH = 480;
+const DEFAULT_WIDTH = 256; // matches the w-64 mobile drawer
+const WIDTH_KEY = "ata_sidebar_width";
+
+/** True at the md breakpoint and up, where the sidebar is static and resizable
+ *  (below it, the sidebar is an overlay drawer and the drag handle is hidden). */
+function useIsDesktop() {
+  const query = "(min-width: 768px)";
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== "undefined" && window.matchMedia(query).matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = () => setIsDesktop(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return isDesktop;
+}
+
 export default function Sidebar() {
   const user = useAppStore((s) => s.user);
   const logout = useAppStore((s) => s.logout);
   const open = useAppStore((s) => s.sidebarOpen);
   const setOpen = useAppStore((s) => s.setSidebarOpen);
+  const isDesktop = useIsDesktop();
+
+  // Persisted desktop width. Applied inline only on desktop; on mobile the aside
+  // falls back to the fixed-width w-64 drawer so a wide desktop choice can't spill
+  // the drawer across a phone screen.
+  const [width, setWidth] = useState(() => {
+    const saved = Number(localStorage.getItem(WIDTH_KEY));
+    return saved >= MIN_WIDTH && saved <= MAX_WIDTH ? saved : DEFAULT_WIDTH;
+  });
+  const dragging = useRef(false);
+
+  useEffect(() => {
+    localStorage.setItem(WIDTH_KEY, String(width));
+  }, [width]);
+
+  // Drag-to-resize. The aside's left edge is at x=0 on desktop, so the pointer's
+  // clientX is the target width; clamp it to the bounds.
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!dragging.current) return;
+      setWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, e.clientX)));
+    };
+    const onUp = () => {
+      if (!dragging.current) return;
+      dragging.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, []);
+
+  const startDrag = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    dragging.current = true;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  }, []);
+
+  // Keyboard resize for accessibility; arrows nudge, double-click resets.
+  const nudge = useCallback((delta: number) => {
+    setWidth((w) => Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, w + delta)));
+  }, []);
 
   // Close the drawer on Escape (mobile). No-op on desktop, where it's always shown.
   useEffect(() => {
@@ -56,10 +126,31 @@ export default function Sidebar() {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 flex-col border-r border-white/10 bg-[#070708] text-slate-300 transition-transform duration-200 ease-out md:static md:z-auto md:translate-x-0 ${
+        style={isDesktop ? { width } : undefined}
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 flex-col border-r border-white/10 bg-[#070708] text-slate-300 transition-transform duration-200 ease-out md:relative md:z-auto md:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
+        {/* Resize handle - desktop only. Straddles the right border with an 8px hit
+            area and a hairline that brightens on hover/drag. */}
+        <div
+          onMouseDown={startDrag}
+          onDoubleClick={() => setWidth(DEFAULT_WIDTH)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft") nudge(-16);
+            else if (e.key === "ArrowRight") nudge(16);
+          }}
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize sidebar"
+          aria-valuenow={width}
+          aria-valuemin={MIN_WIDTH}
+          aria-valuemax={MAX_WIDTH}
+          tabIndex={0}
+          className="group absolute -right-1 top-0 z-10 hidden h-full w-2 cursor-col-resize md:block"
+        >
+          <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-white/10 transition-colors group-hover:bg-white/40 group-focus-visible:bg-white/50" />
+        </div>
         {/* Brand */}
         <div className="flex items-center gap-3 px-5 py-6">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-black shadow-lg shadow-white/10 ring-1 ring-white/20">
