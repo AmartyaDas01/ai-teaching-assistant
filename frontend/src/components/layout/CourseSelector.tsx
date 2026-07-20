@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { createCourse, listCourses } from "../../services/api";
 import { useAppStore } from "../../store/useAppStore";
 import type { Course } from "../../types";
@@ -109,7 +110,11 @@ function NewCourseModal({
     }
   }
 
-  return (
+  // Rendered through a portal to document.body: the sidebar this modal is mounted
+  // under carries a CSS transform (the drawer slide), which would otherwise make
+  // `position: fixed` anchor to the sidebar instead of the viewport - trapping the
+  // dialog inside the sidebar and resizing it as the sidebar is dragged.
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
       role="dialog"
@@ -178,6 +183,7 @@ function NewCourseModal({
           </button>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body
   );
 }
